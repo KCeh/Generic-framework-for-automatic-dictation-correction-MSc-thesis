@@ -3,7 +3,7 @@ import cv2
 import os
 
 path = os.path.dirname(os.path.abspath(__file__))
-dir_for_test_samples=dir_for_results=os.path.join(path, "test-slike")
+dir_for_test_samples=dir_for_results=os.path.join(path, "test-pictures")
 dir_for_results=os.path.join(path, "contrast-normalization-results")
 print(dir_for_results)
 

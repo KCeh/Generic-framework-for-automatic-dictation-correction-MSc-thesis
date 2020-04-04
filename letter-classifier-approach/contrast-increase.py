@@ -2,7 +2,7 @@ from PIL import Image, ImageEnhance
 import os
 
 path = os.path.dirname(os.path.abspath(__file__))
-dir_for_test_samples=dir_for_results=os.path.join(path, "test-slike")
+dir_for_test_samples=dir_for_results=os.path.join(path, "test-pictures")
 dir_for_results=os.path.join(path, "contrast-increase-results")
 
 for (dirpath, dirnames, filenames) in os.walk(dir_for_test_samples):
