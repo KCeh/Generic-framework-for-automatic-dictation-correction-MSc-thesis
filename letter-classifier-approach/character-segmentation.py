@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-#np.set_printoptions(threshold='nan')
+#https://github.com/dishank-b/Character_Segmentation
 
 #------------------Functions------------------#
 
@@ -154,7 +154,7 @@ def letter_seg(lines_img, x_lines, i):
 	#chalu_img, contours, hierarchy = cv2.findContours(copy_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)	
 	contours, hierarchy = cv2.findContours(copy_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)	
 	for cnt in contours:
-		if cv2.contourArea(cnt) > 50:
+		if cv2.contourArea(cnt) > 80: #modify size
 			x,y,w,h = cv2.boundingRect(cnt)
 			# letter_img.append(lines_img[i][y:y+h, x:x+w])
 			letter_k.append((x,y,w,h))
@@ -169,14 +169,14 @@ def letter_seg(lines_img, x_lines, i):
 			letter_index += 1
 			letter_img_tmp = lines_img[i][letter[e][1]-5:letter[e][1]+letter[e][3]+5,letter[e][0]-5:letter[e][0]+letter[e][2]+5]
 			letter_img = cv2.resize(letter_img_tmp, dsize =(28, 28), interpolation = cv2.INTER_AREA)
-			cv2.imwrite('./character-segmentation-results/'+str(i+1)+'_'+str(word)+'_'+str(letter_index)+'.jpg', 255-letter_img)
+			cv2.imwrite('./character-segmentation-results/'+str(i+1)+'_'+str(word)+'_'+str(letter_index)+'.png', letter_img) #255-letter_img for inverting
 		else:
 			x_linescopy.pop(0)
 			word += 1
 			letter_index = 1
 			letter_img_tmp = lines_img[i][letter[e][1]-5:letter[e][1]+letter[e][3]+5,letter[e][0]-5:letter[e][0]+letter[e][2]+5]
 			letter_img = cv2.resize(letter_img_tmp, dsize =(28, 28), interpolation = cv2.INTER_AREA)
-			cv2.imwrite('./character-segmentation-results/'+str(i+1)+'_'+str(word)+'_'+str(letter_index)+'.jpg', 255-letter_img)
+			cv2.imwrite('./character-segmentation-results/'+str(i+1)+'_'+str(word)+'_'+str(letter_index)+'.png', letter_img)
 			# print(letter[e][0],x_linescopy[0], word)
 						
 		
@@ -189,7 +189,7 @@ def letter_seg(lines_img, x_lines, i):
 
 
 print("\n........Program Initiated.......\n")
-src_img= cv2.imread('./test-pictures/scan0002.png', 1)
+src_img= cv2.imread('./test-pictures/scan0005.png', 1)
 copy = src_img.copy()
 height = src_img.shape[0]
 width = src_img.shape[1]
