@@ -1,6 +1,6 @@
 from google.cloud import vision
-# from PIL import Image, ImageDraw
-import cv2
+from PIL import Image, ImageDraw
+#import cv2
 from enum import Enum
 import io
 import os
@@ -15,46 +15,17 @@ class FeatureType(Enum):
     SYMBOL = 5
 
 
-def extract_vertices(vertices):
-    """ Extract two opposite vertices from a list of 4 (assumption: rectangle) """
-    min_x,max_x,min_y,max_y = float("inf"),float("-inf"),float("inf"),float("-inf")
-
-    for v in vertices:
-        if v.x < min_x:
-            min_x = v.x
-        if v.x > max_x:
-            max_x = v.x
-        if v.y < min_y:
-            min_y = v.y
-        if v.y > max_y:
-            max_y = v.y
-
-    v1 = None
-    v2 = None
-    for v in vertices:
-        if v.x == min_x and v.y == min_y:
-            v1=v
-        if v.x == max_x and v.y == max_y:
-            v2=v
-
-    return v1,v2
 
 def draw_boxes(image, bounds, color):
     """Draw a border around the image using the hints in the vector list."""
-    # draw = ImageDraw.Draw(image)
+    draw = ImageDraw.Draw(image)
 
-    # for bound in bounds:
-    #    draw.polygon([
-    #        bound.vertices[0].x, bound.vertices[0].y,
-    #        bound.vertices[1].x, bound.vertices[1].y,
-    #        bound.vertices[2].x, bound.vertices[2].y,
-    #        bound.vertices[3].x, bound.vertices[3].y], None, color)
     for bound in bounds:
-        v1,v2 = extract_vertices(bound.vertices)
-        if v1 is not None and v2 is not None:
-            pt1 = (v1.x, v1.y)
-            pt2 = (v2.x, v2.y)
-            image = cv2.rectangle(image, pt1, pt2, (0, 255, 0), 2)
+        draw.polygon([
+            bound.vertices[0].x, bound.vertices[0].y,
+            bound.vertices[1].x, bound.vertices[1].y,
+            bound.vertices[2].x, bound.vertices[2].y,
+            bound.vertices[3].x, bound.vertices[3].y], None, color)
     return image
 
 
@@ -94,19 +65,19 @@ def get_document_bounds(image_file, client, feature):
 
 def render_doc_text(folder_to_load, filein, folder_to_save, client):
     full_file_path = os.path.join(folder_to_load, filein)
-    # image = Image.open(full_file_path)
-    image = cv2.imread(full_file_path)
+    image = Image.open(full_file_path).convert('LA')
     # bounds = get_document_bounds(full_file_path, client, FeatureType.BLOCK)
     # draw_boxes(image, bounds, 'blue')
     # bounds = get_document_bounds(full_file_path, client, FeatureType.PARA)
     # draw_boxes(image, bounds, 'red')
     bounds = get_document_bounds(full_file_path, client, FeatureType.WORD)
     draw_boxes(image, bounds, 'green')
+    #color not importat as image is in grayscale
 
     fileout = filein.split(".")[0]+'-result.png'
     full_file_path = os.path.join(folder_to_save, fileout)
-    # image.save(full_file_path)
-    cv2.imwrite(full_file_path, image)
+    image.save(full_file_path)
+    #cv2.imwrite(full_file_path, image)
 
 
 if __name__ == "__main__":
