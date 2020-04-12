@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import os
 import sys
+import shutil
 import tensorflow as tf
 from tensorflow.keras import models
 
@@ -198,6 +199,7 @@ def letter_seg(lines_img, x_lines, i):
 def init():
     print("TF version:")
     print(tf.version.VERSION)  # must be >= 2.0.0
+    tf.config.set_visible_devices([], 'GPU') #for local testing, GPU causing errors
     model = load_model()
     return model
 
