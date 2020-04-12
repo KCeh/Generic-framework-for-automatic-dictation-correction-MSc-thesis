@@ -9,6 +9,7 @@ from tensorflow.keras import models
 from scipy.misc import imsave, imread, imresize
 
 UPLOAD_FOLDER='./static/uploads/'
+ERROR_TEXT="Unable to process.\nPlease try with another image."
 
 width=0
 height=0
@@ -204,7 +205,7 @@ def init():
     return model
 
 
-def ocr(filename, model):
+def ocr(model, filename):
     file=os.path.join(UPLOAD_FOLDER, filename)
     path = os.path.dirname(os.path.abspath(__file__))
     dir = os.path.join(path, "characters")
@@ -263,8 +264,7 @@ def ocr(filename, model):
             lines.append((upperlines[y], lowerlines[y]))
 
     else:
-        print("Too much noise in image, unable to process.\nPlease try with another image. Ctrl-C to exit:- ")
-        exit()
+        return ERROR_TEXT
 
     lines = np.array(lines)
 
