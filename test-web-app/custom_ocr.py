@@ -2,11 +2,8 @@ import numpy as np
 import cv2
 import os
 import sys
-import shutil
 import tensorflow as tf
 from tensorflow.keras import models
-# in newer version of scipy deprecated! use opencv or something for that
-from scipy.misc import imsave, imread, imresize
 
 UPLOAD_FOLDER='./static/uploads/'
 ERROR_TEXT="Unable to process.\nPlease try with another image."
@@ -30,7 +27,7 @@ def load_model():
 
 
 def classify_letter(model, filename):
-    x = imread(filename, mode='L')  # L black and with
+    x = cv2.imread(filename,cv2.IMREAD_GRAYSCALE)  # L black and with
 
     x = x.reshape(1, 28, 28, 1)  # reshape for model
     x = x.astype('float32')
