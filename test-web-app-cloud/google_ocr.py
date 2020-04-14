@@ -2,8 +2,8 @@ from google.cloud import vision
 import io
 import os
 
-path = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER=os.path.join(path, "static/uploads/")
+
+UPLOAD_FOLDER='uploads'
 
 def init():
     #if env var not set use:
