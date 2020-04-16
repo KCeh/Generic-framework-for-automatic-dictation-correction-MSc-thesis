@@ -8,6 +8,7 @@ from tensorflow.keras import models
 # in newer version of scipy deprecated! use opencv or something for that
 from scipy.misc import imsave, imread, imresize
 
+import json, codecs
 
 class_names = ['A', 'B', 'C', 'D', 'E',
                'F', 'G', 'H', 'I', 'J',
@@ -31,6 +32,12 @@ def classify_letter(model, filename):
     x = x.astype('float32')
 
     x /= 255
+    
+    #code for generating JSON, for model deployment
+    a=x.tolist()
+    filename=os.path.splitext(filename)[0]
+    filename=filename+'.json'
+    json.dump(a, codecs.open(filename, 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True, indent=4) ### this saves the array in .json format
 
     out = model.predict(x)
     # return name of letter for index with max prob
