@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 from tensorflow import keras
+import json
 
 
 class_names = ['A', 'B', 'C', 'D', 'E',
@@ -46,7 +47,17 @@ inputs=np.array(inputs)
 #print(n)
 #print(np.shape(inputs))
 
-#classify
+#create instances JSON
+data={}
+data["instances"]=inputs.tolist()
+with open('instances.json', 'w') as outfile:
+    json.dump(data, outfile)
+
+#classify using JSON data
+with open('instances.json') as json_file:
+    data = json.load(json_file)
+
+inputs=data["instances"]
 results=[]
 outputs = model.predict(inputs)
 for out in outputs:
