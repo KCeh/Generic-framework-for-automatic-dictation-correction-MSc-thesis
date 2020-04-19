@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import os
 import sys
+import re
 import shutil
 import googleapiclient.discovery
 
@@ -160,7 +161,7 @@ def letter_seg(lines_img, x_lines, i):
                                           letter[e][3]+5, letter[e][0]-5:letter[e][0]+letter[e][2]+5]
             letter_img = cv2.resize(letter_img_tmp, dsize=(
                 28, 28), interpolation=cv2.INTER_AREA)
-            cv2.imwrite('/tmp/characters/'+str(i+1)+'_'+str(word)+'_' +
+            cv2.imwrite('/tmp/'+str(i+1)+'_'+str(word)+'_' +
                         str(letter_index)+'.png', letter_img)  # 255-letter_img for inverting
         else:
             x_linescopy.pop(0)
@@ -170,9 +171,10 @@ def letter_seg(lines_img, x_lines, i):
                                           letter[e][3]+5, letter[e][0]-5:letter[e][0]+letter[e][2]+5]
             letter_img = cv2.resize(letter_img_tmp, dsize=(
                 28, 28), interpolation=cv2.INTER_AREA)
-            cv2.imwrite('/tmp/characters/'+str(i+1)+'_'+str(word) +
+            cv2.imwrite('/tmp/'+str(i+1)+'_'+str(word) +
                         '_'+str(letter_index)+'.png', letter_img)
             # print(letter[e][0],x_linescopy[0], word)
+        print("letter written")
 
 
 
@@ -215,7 +217,7 @@ def init():
 
 
 def ocr(filename):
-    dir="/tmp/characters/"
+    dir="/tmp"
 
     '''
     #better solution?
@@ -308,9 +310,12 @@ def ocr(filename):
     for i in range(len(lines)):
         letter_seg(lines_img, x_lines, i)
 
+    pattern = re.compile("[0-9]+_[0-9]+_[0-9]+.png")
     letters = []
     for (dirpath, dirnames, filenames) in os.walk(dir):
-        letters.extend(filenames)
+        for filename in filenames:
+            if pattern.search(filename):
+                letters.append(filename)
 
     if len(letters) == 0:
         return ""
@@ -341,8 +346,7 @@ def ocr(filename):
     respones = predict_json(project="msc-thesis-test-web-app",
                             region="europe-west1", model="predict_letters", instances=instances)
     
-
-    result = []
+    print(respones)
     word_index = 1
     line_index = 1
     i=0
