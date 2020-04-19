@@ -160,7 +160,7 @@ def letter_seg(lines_img, x_lines, i):
                                           letter[e][3]+5, letter[e][0]-5:letter[e][0]+letter[e][2]+5]
             letter_img = cv2.resize(letter_img_tmp, dsize=(
                 28, 28), interpolation=cv2.INTER_AREA)
-            cv2.imwrite('./characters/'+str(i+1)+'_'+str(word)+'_' +
+            cv2.imwrite('/tmp/characters/'+str(i+1)+'_'+str(word)+'_' +
                         str(letter_index)+'.png', letter_img)  # 255-letter_img for inverting
         else:
             x_linescopy.pop(0)
@@ -170,7 +170,7 @@ def letter_seg(lines_img, x_lines, i):
                                           letter[e][3]+5, letter[e][0]-5:letter[e][0]+letter[e][2]+5]
             letter_img = cv2.resize(letter_img_tmp, dsize=(
                 28, 28), interpolation=cv2.INTER_AREA)
-            cv2.imwrite('./characters/'+str(i+1)+'_'+str(word) +
+            cv2.imwrite('/tmp/characters/'+str(i+1)+'_'+str(word) +
                         '_'+str(letter_index)+'.png', letter_img)
             # print(letter[e][0],x_linescopy[0], word)
 
@@ -215,9 +215,9 @@ def init():
 
 
 def ocr(filename):
-    path = os.path.dirname(os.path.abspath(__file__))
-    dir = os.path.join(path, "characters")
+    dir="/tmp/characters/"
 
+    '''
     #better solution?
     try:
         shutil.rmtree(dir)
@@ -228,6 +228,7 @@ def ocr(filename):
         os.mkdir(dir)
     except OSError:
         print("Creation of the directory %s failed" % dir)
+    '''
 
     src_img = cv2.imread(filename, 1)
     copy = src_img.copy()
@@ -311,6 +312,9 @@ def ocr(filename):
     for (dirpath, dirnames, filenames) in os.walk(dir):
         letters.extend(filenames)
 
+    if len(letters) == 0:
+        return ""
+    
     temp = []
     for letter in letters:
         # remove filename extension
@@ -322,9 +326,6 @@ def ocr(filename):
     # sort by name (as int not string!)
     letters = sorted(temp, key=lambda l: (int(l[0]), int(l[1]), int(l[2])))
     # print(letters)
-    '''
-    
-    '''
 
     inputs = []
     for letter in letters:

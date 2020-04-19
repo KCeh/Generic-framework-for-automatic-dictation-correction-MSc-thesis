@@ -21,7 +21,7 @@ def index():
 @app.route('/api/ocr', methods=['POST'])
 def do_ocr():
     id = uuid.uuid4()
-    path = "./uploads/"+str(id)+".png"
+    path = "/tmp/"+str(id)+".png"
 
     nparr = np.fromstring(request.data, np.uint8) #frombuffer?
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
