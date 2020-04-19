@@ -18,10 +18,11 @@
 
    <h2>Result:</h1>
   
-   {% if extracted_text_custom or extracted_text_vision_api%}
-     <p> The extracted text (Vision API) from the image above is: <b> {{ extracted_text_vision_api }} </b></p>
-   {% else %}
-     The extracted text will be displayed here
+    {% if extracted_text_custom or extracted_text_vision_api%}
+      <p> The extracted text (custom OCR) from the image above is: <b> {{ extracted_text_custom }} </b></p>
+      <p> The extracted text (Vision API) from the image above is: <b> {{ extracted_text_vision_api }} </b></p>
+    {% else %}
+      The extracted text will be displayed here
    {% endif %}
  </body>
 </html>

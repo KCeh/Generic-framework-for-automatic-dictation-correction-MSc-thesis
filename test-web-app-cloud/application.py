@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import google_ocr
+import custom_ocr
 from werkzeug.utils import secure_filename
 import os
 
@@ -35,11 +36,13 @@ def upload_page():
 
             # call the OCR function on it
             print(filename)
+            extracted_text_custom = custom_ocr.ocr(filename)
             extracted_text_vision_api=google_ocr.ocr(client, filename)
 
             # extract the text and display it
             return render_template('upload.html',
                                    msg='Successfully processed',
+                                   extracted_text_custom=extracted_text_custom,
                                    extracted_text_vision_api=extracted_text_vision_api)
     elif request.method == 'GET':
         return render_template('upload.html')
