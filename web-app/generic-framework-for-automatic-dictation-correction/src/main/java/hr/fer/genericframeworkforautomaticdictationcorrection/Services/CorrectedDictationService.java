@@ -2,6 +2,7 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.Services;
 
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface CorrectedDictationService {
     CorrectedDictation saveCorrectedDictation(CorrectedDictation correctedDictation);
 
     void deleteCorrectedDictation(CorrectedDictation correctedDictation);
+
+    List<CorrectedDictation> findByUser(User user);
 }

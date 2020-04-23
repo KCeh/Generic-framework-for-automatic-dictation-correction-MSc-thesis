@@ -24,6 +24,10 @@ public class CorrectedDictation {
     @JoinColumn(name = "dictate_id", nullable = false)
     private Dictate dictate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public Long getId() {
         return Id;
     }
@@ -78,5 +82,13 @@ public class CorrectedDictation {
 
     public void setDictate(Dictate dictate) {
         this.dictate = dictate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

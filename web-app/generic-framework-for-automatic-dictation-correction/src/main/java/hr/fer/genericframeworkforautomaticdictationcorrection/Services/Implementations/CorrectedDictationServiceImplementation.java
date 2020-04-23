@@ -2,6 +2,7 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.Services.Implemen
 
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Repositories.CorrectedDictationRepository;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.CorrectedDictationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,10 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
     @Override
     public void deleteCorrectedDictation(CorrectedDictation correctedDictation) {
         correctedDictationRepository.delete(correctedDictation);
+    }
+
+    @Override
+    public List<CorrectedDictation> findByUser(User user) {
+        return correctedDictationRepository.findByUser(user);
     }
 }
