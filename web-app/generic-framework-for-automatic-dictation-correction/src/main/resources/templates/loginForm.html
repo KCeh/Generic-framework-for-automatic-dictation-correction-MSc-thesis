@@ -22,7 +22,7 @@
                                     <div class="alert alert-info" th:if="${param.message != null}" th:text="${param.message}">
                                         error
                                     </div>
-                                    <form class="form" role="form" autocomplete="off" id="formLogin" novalidate="" method="POST">
+                                    <form class="form" th:action="@{/login}" autocomplete="off" id="formLogin" novalidate="" method="POST">
                                         <div class="form-group">
                                             <label for="username" th:text="#{page.register.email}">Username</label>
                                             <input type="email" name="username" id="username" placeholder="email" class="form-control">

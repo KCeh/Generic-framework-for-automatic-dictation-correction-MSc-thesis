@@ -24,8 +24,8 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <div sec:authorize="isAuthenticated()">
-                    <a class="btn btn-primary" th:href="@{/viewProfile}" th:inline="text"><i class="fa fa-user"></i>
-                        [[${#httpServletRequest.remoteUser}]]</a>
+                    <span class="navbar-text"  th:text="#{page.layout.username(${#httpServletRequest.remoteUser})}">text</span>
+                    &nbsp
                     <a class="btn btn-primary" th:href="@{/logout}" th:text="#{page.logout.label}">logout</a>
                 </div>
 
