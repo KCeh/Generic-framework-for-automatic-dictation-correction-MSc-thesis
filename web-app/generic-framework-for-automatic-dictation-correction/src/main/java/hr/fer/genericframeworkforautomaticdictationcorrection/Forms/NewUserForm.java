@@ -1,10 +1,12 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Forms;
 
+import hr.fer.genericframeworkforautomaticdictationcorrection.Validators.PasswordMatches;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Validators.ValidEmail;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+@PasswordMatches
 public class NewUserForm {
     @NotNull
     @NotEmpty
