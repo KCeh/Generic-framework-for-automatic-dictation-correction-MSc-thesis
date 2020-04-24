@@ -20,7 +20,7 @@
                                         error
                                     </div>
                                     <div class="alert alert-info" th:if="${param.message != null}" th:text="${param.message}">
-                                        error
+                                        alert
                                     </div>
                                     <form class="form" th:action="@{/login}" autocomplete="off" id="formLogin" novalidate="" method="POST">
                                         <div class="form-group">
@@ -35,7 +35,7 @@
 
                                     </form>
                                     <br>
-                                    <a class="btn btn-primary" th:text="#{page.register.label}" th:href="@{/registration}">register</a> &nbsp;&nbsp;
+                                    <a class="btn btn-primary" th:text="#{page.register.label}" th:href="@{/signup}">register</a> &nbsp;&nbsp;
                                     <a class="btn btn-warning" th:href="@{/forgotPassword}" th:text="#{page.forgotPassword.title}">reset</a>
                                 </div>
                             </div>

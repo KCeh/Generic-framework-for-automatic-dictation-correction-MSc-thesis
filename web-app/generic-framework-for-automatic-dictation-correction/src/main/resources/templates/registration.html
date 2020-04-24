@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout.html}">
+<head>
+    <title th:text="#{page.register.title}">create new account</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div th:fragment="content">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6 mx-auto">
+                            <div class="card rounded-0">
+                                <div class="card-header">
+                                    <h3 class="mb-0" th:text="#{page.register.title}">register</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form class="form" role="form" th:object="${user}" id="formRegister" novalidate="" method="POST">
+                                        <div class="form-group">
+                                            <label class="control-label" th:text="#{page.register.firstName}">firstName</label>
+                                            <div class="controls">
+                                                <input type="text" id="firstName" th:field="*{firstName}" placeholder="" class="form-control">
+                                                <p class="text-danger" th:each="error: ${#fields.errors('firstName')}" th:text="${error}">Validation
+                                                    error</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label" th:text="#{page.register.lastName}">lastName</label>
+                                            <div class="controls">
+                                                <input type="text" id="lastName" th:field="*{lastName}" placeholder="" class="form-control">
+                                                <p class="text-danger" th:each="error: ${#fields.errors('lastName')}" th:text="${error}">Validation
+                                                    error</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label" th:text="#{page.register.email}">email</label>
+                                            <div class="controls">
+                                                <input type="email" id="email" th:field="*{email}" placeholder="" class="form-control">
+                                                <p class="text-danger" th:each="error: ${#fields.errors('email')}" th:text="${error}">Validation
+                                                    error</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label" th:text="#{page.register.password}">password</label>
+                                            <div class="controls">
+                                                <input type="password" id="password" th:field="*{password}" placeholder="" class="form-control">
+                                                <p class="text-danger" th:each="error: ${#fields.errors('password')}" th:text="${error}">Validation
+                                                    error</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label" th:text="#{page.register.confirmPassword}">confirmPassword</label>
+                                            <div class="controls">
+                                                <input type="password" id="confirmPassword" th:field="*{repeatedPassword}" placeholder="" class="form-control">
+                                                <p class="text-danger" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.errors('global')}" th:text="${error}">
+                                                    Validation
+                                                    error</p>
+                                            </div>
+                                        </div>
+
+
+                                        <button class="btn btn-success" type="submit" th:text="#{submit}">Submit</button>
+
+                                    </form>
+                                    <br>
+                                    <a class="btn btn-primary" th:href="@{/login}" th:text="#{page.login.label}">Login</a>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout.html}">
+
+<head>
+    <title th:text="#{page.baduser.error}">error</title>
+</head>
+
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h3 th:text="#{page.baduser.tokenError}">token error</h3>
+        <a class=" btn btn-primary" th:href="@{/registration}" th:text="#{page.baduser.signup}">register</a>
+    </div>
+</div>
+</body>
+
+</html>

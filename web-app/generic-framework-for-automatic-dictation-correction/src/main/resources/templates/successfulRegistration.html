@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout.html}">
+<head>
+    <title th:text="#{page.succReg.title}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h2 th:text="#{page.succReg.title}">account created</h2>
+
+        <h2 th:text="#{page.succReg.msg}">A confirmation link has been sent to your email address!</h2>
+
+        <br>
+        <br>
+        <a class="btn btn-primary" th:href="@{/login}" th:text="#{page.login.label}">Login</a>
+    </div>
+</div>
+</body>
+</html>
