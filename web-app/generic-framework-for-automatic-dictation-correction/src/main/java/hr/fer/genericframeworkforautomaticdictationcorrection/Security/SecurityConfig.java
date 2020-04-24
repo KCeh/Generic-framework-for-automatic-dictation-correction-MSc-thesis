@@ -29,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //use csrf
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(Constants.Paths.RESOURCES, Constants.Paths.BASE_PATH, Constants.Paths.HOME, Constants.Paths.WEBJARS, Constants.Paths.JS, Constants.Paths.CSS, Constants.Paths.LOGIN_WITH_PARMS)
+                .antMatchers(Constants.Paths.RESOURCES, Constants.Paths.BASE_PATH, Constants.Paths.HOME, Constants.Paths.WEBJARS, Constants.Paths.JS, Constants.Paths.CSS, Constants.Paths.LOGIN_WITH_PARMS, Constants.Paths.REGISTRATION, Constants.Paths.REGISTRATION_COFIRMATION, Constants.Paths.BAD_USER)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
