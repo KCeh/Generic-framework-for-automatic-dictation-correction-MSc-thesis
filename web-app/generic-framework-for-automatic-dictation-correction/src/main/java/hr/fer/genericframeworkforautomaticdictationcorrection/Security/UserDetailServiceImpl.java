@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,12 +31,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }
 
         Collection<Role> roles = user.getRoles();
-        //process names
-        //add to new list
-        //send to userdetalis
+        String[] rolesToAdd = new String[roles.size()];
+        roles.stream().map(r->r.getName().split("_")[1]).collect(Collectors.toList()).toArray(rolesToAdd);
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getFirstName()+" "+user.getLastName()).disabled(!user.isActive()).password(user.getPassword()).roles("USER").build();
-        //check roles stuff
+                .withUsername(user.getFirstName()+" "+user.getLastName()).disabled(!user.isActive()).password(user.getPassword()).roles(rolesToAdd).build();
     }
 }
