@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.home.title}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h2 class="m-1" th:text="#{page.manageUsers.title}">title </h2>
+    </div>
+</div>
+</body>
+</html>
