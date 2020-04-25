@@ -8,6 +8,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Services.Corrected
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -36,16 +37,19 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
     }
 
     @Override
+    @Transactional
     public CorrectedDictation updateCorrectedDictation(CorrectedDictation correctedDictation) {
         return correctedDictationRepository.save(correctedDictation);
     }
 
     @Override
+    @Transactional
     public CorrectedDictation saveCorrectedDictation(CorrectedDictation correctedDictation) {
         return correctedDictationRepository.save(correctedDictation);
     }
 
     @Override
+    @Transactional
     public void deleteCorrectedDictation(CorrectedDictation correctedDictation) {
         correctedDictationRepository.delete(correctedDictation);
     }

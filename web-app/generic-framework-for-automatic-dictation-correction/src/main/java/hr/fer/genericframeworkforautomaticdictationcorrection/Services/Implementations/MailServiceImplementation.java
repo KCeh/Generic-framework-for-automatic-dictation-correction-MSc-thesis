@@ -17,7 +17,7 @@ public class MailServiceImplementation implements MailService {
     @Autowired
     private MessageSource messageSource;
 
-    private static final String SERVER = " http://localhost:8000"; //fix
+    private static final String SERVER = " http://localhost:8000"; //fix //use from user controller getAppUrl!!!
 
     @Override
     public void confirmRegistrationMail(String emailAddress, String confirmationUrl, String baseUrl, Locale locale) {
@@ -29,7 +29,11 @@ public class MailServiceImplementation implements MailService {
     }
 
     @Override
-    public void resetPasswordMail(String emailAddress, String url) {
-
+    public void resetPasswordMail(String emailAddress, String url, Locale locale) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setSubject(messageSource.getMessage("mail.reset.subject", null, locale));
+        email.setText(messageSource.getMessage("mail.reset.click", null, locale) + url);
+        email.setTo(emailAddress);
+        mailSender.send(email);
     }
 }

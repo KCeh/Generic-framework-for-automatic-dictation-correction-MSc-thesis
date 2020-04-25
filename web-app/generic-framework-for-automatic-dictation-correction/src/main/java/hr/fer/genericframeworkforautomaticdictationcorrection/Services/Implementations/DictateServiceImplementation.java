@@ -8,6 +8,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateSe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -36,16 +37,19 @@ public class DictateServiceImplementation implements DictateService {
     }
 
     @Override
+    @Transactional
     public Dictate updateDictate(Dictate dictate) {
         return dictateRepository.save(dictate);
     }
 
     @Override
+    @Transactional
     public Dictate saveDictate(Dictate dictate) {
         return dictateRepository.save(dictate);
     }
 
     @Override
+    @Transactional
     public void deleteDictate(Dictate dictate) {
         dictateRepository.delete(dictate);
     }

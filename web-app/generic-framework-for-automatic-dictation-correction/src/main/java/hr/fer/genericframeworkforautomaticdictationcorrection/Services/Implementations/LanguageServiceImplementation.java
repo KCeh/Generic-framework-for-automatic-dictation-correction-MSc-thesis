@@ -6,6 +6,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Services.LanguageS
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -29,16 +30,19 @@ public class LanguageServiceImplementation implements LanguageService {
     }
 
     @Override
+    @Transactional
     public Language updateLanguage(Language language) {
         return languageRepository.save(language);
     }
 
     @Override
+    @Transactional
     public Language saveLanguage(Language language) {
         return languageRepository.save(language);
     }
 
     @Override
+    @Transactional
     public void deleteLanguage(Language language) {
         languageRepository.delete(language);
     }
