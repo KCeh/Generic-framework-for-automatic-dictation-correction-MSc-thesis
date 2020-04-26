@@ -35,6 +35,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         roles.stream().map(r->r.getName().split("_")[1]).collect(Collectors.toList()).toArray(rolesToAdd);
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getFirstName()+" "+user.getLastName()).disabled(!user.isActive()).password(user.getPassword()).roles(rolesToAdd).build();
+                .withUsername(user.getEmail()).disabled(!user.isActive()).password(user.getPassword()).roles(rolesToAdd).build();
     }
 }

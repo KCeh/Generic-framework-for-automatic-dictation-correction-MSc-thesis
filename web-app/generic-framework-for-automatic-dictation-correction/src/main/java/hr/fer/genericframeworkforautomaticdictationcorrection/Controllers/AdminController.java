@@ -1,6 +1,5 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Controllers;
 
-import hr.fer.genericframeworkforautomaticdictationcorrection.Models.ManageUsersPostModel;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Role;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.UserViewModel;
@@ -40,7 +39,7 @@ public class AdminController {
 
             //check
             org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User currentUser = userService.findByUserDetailsUsername(userDetails.getUsername());
+            User currentUser = userService.findByEmail(userDetails.getUsername());
             List<User> allUsers = userService.findAll();
             allUsers.remove(currentUser);
 
@@ -48,7 +47,7 @@ public class AdminController {
 
             model.addAttribute("users", viewModel);
 
-            return Constants.Paths.MANAGE_USERS;
+            return Constants.Views.MANAGE_USERS;
 
         }else {
             return Constants.Redirect.BASE_PATH_ACCESS_DENIED;
