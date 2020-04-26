@@ -21,7 +21,24 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-
+                <div class="btn-group">
+                    <div class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:inline="text">[[#{page.dictate.label}]]
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" th:href="@{/dictate/my}" th:text="#{page.dictate.viewMy}">my</a>
+                            <a class="dropdown-item" sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/dictate/all}" th:text="#{page.dictate.viewAll}">all</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:inline="text">[[#{page.corrections.label}]]
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" th:href="@{/corrections/my}" th:text="#{page.corrections.view}">my</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
             </ul>
 
             <ul class="navbar-nav ml-auto">
