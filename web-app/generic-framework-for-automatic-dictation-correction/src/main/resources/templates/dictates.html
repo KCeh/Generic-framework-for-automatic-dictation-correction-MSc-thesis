@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.dictate.title}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.dictate.title}">title </h4>
+    </div>
+    <br>
+    <div class="alert alert-danger" th:if="${param.error != null}" th:text="${param.error}">
+        error
+    </div>
+    <div class="alert alert-info" th:if="${param.message != null}" th:text="${param.message}">
+        alert
+    </div>
+    <br>
+    <a th:href="@{/dictate/create}" th:text="#{page.dictate.create}"></a>
+    <br>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th scope="col" class="text-center">Name</th>
+            <th scope="col" class="text-center">Language</th>
+            <th scope="col" class="text-center">Creator</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="dictate : ${dictates}">
+            <td></td>
+            <td class="text-center" th:text="${dictate.getName()}">email</td>
+            <td class="text-center" th:text="${dictate.getLanguage().getName()}">language</td>
+            <td class="text-center" th:text="|${dictate.getUser().getFirstName()} ${dictate.getUser().getLastName()}|">lastname</td>
+            <td class="btn-group">
+                <button type="button" class="btn btn-outline-primary" th:attr="onclick=|checkAuthority('edit','${#authentication.name}', '${dictate.getUser().getEmail()}', '${dictate.getId()}')|" th:value="#{page.dictate.edit}"><i class="fas fa-edit"></i></button>
+                &nbsp;
+                <button type="button" class="btn btn-outline-danger"  th:attr="onclick=|checkAuthority('delete','${#authentication.name}', '${dictate.getUser().getEmail()}', '${dictate.getId()}')|" th:value="#{page.dictate.delete}"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <script type="text/javascript" src="/js/dictatesUtils.js"></script>
+</div>
+</body>
+</html>
