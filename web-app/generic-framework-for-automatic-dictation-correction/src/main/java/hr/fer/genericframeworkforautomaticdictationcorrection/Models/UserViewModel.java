@@ -16,7 +16,7 @@ public class UserViewModel {
     public UserViewModel(User user){
         email=user.getEmail();
         firstName = user.getFirstName();
-        lastName = user.getFirstName();
+        lastName = user.getLastName();
         Collection<Role> userRoles=user.getRoles();
 
         roles=new ArrayList<>();
