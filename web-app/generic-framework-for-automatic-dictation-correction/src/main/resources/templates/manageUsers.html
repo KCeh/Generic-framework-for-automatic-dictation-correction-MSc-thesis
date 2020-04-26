@@ -9,8 +9,39 @@
 <body>
 <div layout:fragment="page_content" id="page_content">
     <div class="container">
-        <h2 class="m-1" th:text="#{page.manageUsers.title}">title </h2>
+        <h4 style="text-align:center" class="m-1" th:text="#{page.manageUsers.title}">title </h4>
     </div>
+    <br>
+    <div class="alert alert-info" th:if="${param.message != null}" th:text="${param.message}">
+        alert
+    </div>
+    <br>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col" class="text-center">Email</th>
+            <th scope="col" class="text-center">First name</th>
+            <th scope="col" class="text-center">Last name</th>
+            <th scope="col" class="text-center">Roles</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td class="text-center" th:text="${user.getEmail()}">email</td>
+            <td class="text-center" th:text="${user.getFirstName()}">firstname</td>
+            <td class="text-center" th:text="${user.getLastName()}">lastname</td>
+            <td class="text-center" th:text="${user.getRoles()}">lastname</td>
+            <td class="btn-group">
+                <button type="button" class="btn btn-outline-primary" th:attr="onclick=|promoteUser('${user.getEmail()}')|"   th:text="#{page.manageUsers.promote}">promote</button>
+                &nbsp;
+                <button type="button" class="btn btn-outline-danger" th:attr="onclick=|demoteUser('${user.getEmail()}')|" th:text="#{page.manageUsers.demote}">demote</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <script type="text/javascript" src="/js/promoteDemote.js"></script>
 </div>
 </body>
 </html>
