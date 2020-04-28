@@ -6,9 +6,10 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DictateRepository  extends JpaRepository<Dictate, Long> {
-    //Dictate findById(Long id);
+    Optional<Dictate> findById(Long id);
 
     Dictate findByName(String name);
 
