@@ -2,24 +2,25 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.Controllers;
 
 import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.UserNotFoundException;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewDictateFrom;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Language;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Services.CorrectedDictationService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.LanguageService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.UserService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.Constants;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.GenericResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -37,6 +38,9 @@ public class DictateController {
 
     @Autowired
     LanguageService languageService;
+
+    @Autowired
+    CorrectedDictationService correctedDictationService;
 
     @RequestMapping(Constants.Paths.DICTATE_ALL)
     public String showAllDictates(Model model) {
@@ -141,6 +145,32 @@ public class DictateController {
         }
 
         return Constants.Redirect.DICTATE_MY;
+    }
+
+    @RequestMapping(value = Constants.Paths.DICTATE_DELETE, method = RequestMethod.POST)
+    @ResponseBody
+    public GenericResponse deleteDictate(@RequestParam("id") Long id) {
+        User user;
+        UserDetails userDetails;
+        try {
+            userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            user = userService.findByEmail(userDetails.getUsername());
+            if(user == null) throw new Exception();
+        } catch (Exception ex) {
+            return new GenericResponse("Error","You+don't+have+authority");
+        }
+
+        Dictate dictate  = dictateService.findById(id);
+        if(dictate == null)
+            return new GenericResponse("Error","Something+went+wrong");
+
+        List<CorrectedDictation> correctedDictations = correctedDictationService.findByDictate(dictate);
+        if(correctedDictations.size()>0)
+            return new GenericResponse("Error","Can't+delete+dictate+because+there+exist+correction+that+needs+information+about+dictate");
+
+
+        dictateService.deleteDictate(dictate);
+        return new GenericResponse("Dictate deleted successfully");
     }
 
 }
