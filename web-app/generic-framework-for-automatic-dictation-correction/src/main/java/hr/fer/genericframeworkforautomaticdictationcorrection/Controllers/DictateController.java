@@ -60,7 +60,25 @@ public class DictateController {
         return Constants.Views.DICTATES;
     }
 
-    //view dictate
+    @RequestMapping(value = Constants.Paths.DICTATE_VIEW, method = RequestMethod.GET)
+    public String viewDictate(@RequestParam int id, Model model) {
+        Dictate dictate = dictateService.findById((long)id);
+
+        if(ObjectUtils.isEmpty(dictate)){
+            return Constants.Redirect.DICTATE_ERROR;
+        }
+
+        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByEmail(userDetails.getUsername());
+
+        if(!dictate.getUser().equals(user)){
+            return Constants.Redirect.DICTATE_NO_AUTHORITY;
+        }
+
+        NewDictateFrom newDictateFrom = new NewDictateFrom(dictate);
+        model.addAttribute("dictate", newDictateFrom);
+        return Constants.Views.VIEW_DICTATE;
+    }
 
     @RequestMapping(value = Constants.Paths.DICTATE_CREATE, method = RequestMethod.GET)
     public String createDictate(Model model) {

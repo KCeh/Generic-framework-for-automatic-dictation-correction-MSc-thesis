@@ -30,5 +30,6 @@ function checkAuthority(method, user, owner, id){
 }
 
 function viewDetails(id) {
-
+    var params="?id="+id;
+    window.location.href = "/dictate/view"+params;
 }
