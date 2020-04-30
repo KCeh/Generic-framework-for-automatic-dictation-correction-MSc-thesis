@@ -6,10 +6,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDi
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Language;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
-import hr.fer.genericframeworkforautomaticdictationcorrection.Services.CorrectedDictationService;
-import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateService;
-import hr.fer.genericframeworkforautomaticdictationcorrection.Services.LanguageService;
-import hr.fer.genericframeworkforautomaticdictationcorrection.Services.UserService;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Services.*;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.Constants;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.GenericResponse;
 import org.apache.commons.lang3.ObjectUtils;
@@ -22,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -41,6 +39,9 @@ public class DictateController {
 
     @Autowired
     CorrectedDictationService correctedDictationService;
+
+    @Autowired
+    StorageService storageService;
 
     @RequestMapping(Constants.Paths.DICTATE_ALL)
     public String showAllDictates(Model model) {
@@ -67,7 +68,6 @@ public class DictateController {
         if(ObjectUtils.isEmpty(dictate)){
             return Constants.Redirect.DICTATE_ERROR;
         }
-
 
         NewDictateFrom newDictateFrom = new NewDictateFrom(dictate);
         model.addAttribute("dictate", newDictateFrom);
@@ -183,6 +183,21 @@ public class DictateController {
 
         dictateService.deleteDictate(dictate);
         return new GenericResponse("Dictate deleted successfully");
+    }
+
+    @RequestMapping(value =Constants.Paths.DICTATE_UPLOAD_AUDIO, method = RequestMethod.POST)
+    @ResponseBody
+    public GenericResponse uploadFile(@RequestParam("file") MultipartFile file) {
+        String url;
+        try {
+            url = storageService.uploadAudio(file);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new GenericResponse("Error","Error while uploading file");
+        }
+
+        return new GenericResponse(url);
     }
 
 }
