@@ -15,8 +15,12 @@ public class Dictate {
     private String name;
 
     @NotEmpty
+    @Lob
+    @Column( length = 100000 )
     private String text;
 
+    @Lob
+    @Column( length = 100000 )
     private String audioUrl;
 
     @ManyToOne

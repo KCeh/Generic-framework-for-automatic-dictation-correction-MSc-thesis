@@ -1,6 +1,7 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "correctedDictation")
@@ -12,12 +13,19 @@ public class CorrectedDictation {
 
     private String name;
 
+    @Lob
+    @Column( length = 100000 )
     private String urlOriginalImage;
 
+    @Lob
+    @Column( length = 100000 )
     private String urlCorrectedImage;
 
+    @Lob
+    @Column( length = 100000 )
     private String detectedText;
 
+    @NotEmpty
     private String usedOCRMethod;
 
     @ManyToOne
