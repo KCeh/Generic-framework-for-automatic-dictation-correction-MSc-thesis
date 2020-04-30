@@ -34,7 +34,7 @@
 
         <tbody>
         <tr th:each="dictate : ${dictates}">
-            <td><button type="button" class="btn btn-outline-secondary" th:attr="onclick=|viewDetails(${dictate.getId()}')|" th:value="#{page.dictate.info}"><i class="fas fa-info"></i></button></td>
+            <td><button type="button" class="btn btn-outline-secondary" th:attr="onclick=|viewDetails('${dictate.getId()}')|" th:value="#{page.dictate.info}"><i class="fas fa-info"></i></button></td>
             <td class="text-center" th:text="${dictate.getName()}">email</td>
             <td class="text-center" th:text="${dictate.getLanguage().getName()}">language</td>
             <td class="text-center" th:text="|${dictate.getUser().getFirstName()} ${dictate.getUser().getLastName()}|">lastname</td>

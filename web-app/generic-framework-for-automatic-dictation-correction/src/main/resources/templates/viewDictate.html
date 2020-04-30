@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.dictate.info}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.dictate.info}">title </h4>
+    </div>
+    <br>
+
+    <div class="container">
+        <div id="dictate" style="margin-top: 50px;" class="mainbox .col-md-6 " th:object="${dictate}">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" th:text="#{page.dictate.create.name}">name</span>
+                        </div>
+                        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Name" readonly>
+                        <div class="col-sm-3">
+                            <small id="name-error" class="text-danger" th:each="error: ${#fields.errors('name')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" th:text="#{page.dictate.view.language}">lan</span>
+                        </div>
+                        <input type="text" id="language" th:field="*{language}" class="form-control" placeholder="lang" readonly>
+                        <div class="col-sm-3">
+                            <small id="language-error" class="text-danger" th:each="error: ${#fields.errors('language')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+                    <br>
+                    <!--https://wavesurfer-js.org/> <-->
+                    <div class="input-group mb-3">
+                        <audio controls>
+                            <source th:src="*{audioUrl}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+
+
+                    <br>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" th:text="#{page.dictate.create.text}">text</span>
+                        </div>
+                        <textarea class="form-control" aria-label="With textarea" id="text"  rows="10" cols="100" th:field="*{text}" readonly></textarea>
+
+                        <div class="col-sm-3">
+                            <small id="text-error" class="text-danger" th:each="error: ${#fields.errors('text')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+
+                    <br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <a class="btn btn-warning" th:href="@{/dictate/my}" th:text="#{back}">back</a>
+                        </div>
+                    </div>
+
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
