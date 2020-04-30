@@ -68,12 +68,6 @@ public class DictateController {
             return Constants.Redirect.DICTATE_ERROR;
         }
 
-        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByEmail(userDetails.getUsername());
-
-        if(!dictate.getUser().equals(user)){
-            return Constants.Redirect.DICTATE_NO_AUTHORITY;
-        }
 
         NewDictateFrom newDictateFrom = new NewDictateFrom(dictate);
         model.addAttribute("dictate", newDictateFrom);
