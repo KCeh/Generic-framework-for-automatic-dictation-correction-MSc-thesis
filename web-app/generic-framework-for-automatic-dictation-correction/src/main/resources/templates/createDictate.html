@@ -50,8 +50,8 @@
                     <div class="input-group mb-3">
                         <input type="hidden" id="audioUrl-input" th:field="*{audioUrl}">
                         <div class="input-group-prepend">
-                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-microphone"></i></button>
-                        </div>
+                            <button class="btn btn-outline-secondary" type="button" id="recorder"><i class="fas fa-microphone"></i></button></div>
+                            <button class="btn btn-outline-danger" th:type="button" id="stop"><i class="fas fa-square"></i></button>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="audio-upload" name="uploadedFile" accept="audio/*">
                             <label class="custom-file-label"  th:text="#{page.dictate.create.audio}">audio</label>
