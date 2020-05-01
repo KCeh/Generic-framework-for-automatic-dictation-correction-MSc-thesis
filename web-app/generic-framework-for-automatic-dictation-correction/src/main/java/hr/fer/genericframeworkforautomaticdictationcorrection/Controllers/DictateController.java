@@ -18,9 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -200,4 +198,18 @@ public class DictateController {
         return new GenericResponse(url);
     }
 
+    @RequestMapping(value =Constants.Paths.DICTATE_TRANSCRIBE, method = RequestMethod.POST)
+    @ResponseBody
+    public GenericResponse uploadFile(@RequestParam("url") String url, @RequestParam("code") String langCode) {
+        String result;
+        try {
+            result = storageService.transcribeAudio(url, langCode);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new GenericResponse("Error","Error while transcribing audio");
+        }
+
+        return new GenericResponse(result);
+    }
 }
