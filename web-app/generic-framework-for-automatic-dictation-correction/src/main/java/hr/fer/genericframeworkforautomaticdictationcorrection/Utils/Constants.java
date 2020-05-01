@@ -22,6 +22,17 @@ public interface Constants {
         String PROMOTE_USER="/manageUsers/promote";
         String DEMOTE_USER="/manageUsers/demote";
 
+        String DICTATE_MY="/dictate/my";
+        String DICTATE_ALL="/dictate/all";
+        String DICTATE_VIEW="/dictate/view";
+        String DICTATE_CREATE="/dictate/create";
+        String DICTATE_EDIT="/dictate/edit";
+        String DICTATE_DELETE="/dictate/delete";
+        String DICTATE_UPLOAD_AUDIO="/dictate/uploadAudio";
+        String DICTATE_TRANSCRIBE="/dictate/transcribe";
+
+        String CORRECTION_MY="/corrections/my";
+
         String RESOURCES = "/resources/**";
         String JS = "/js/**";
         String CSS = "/css/**";
@@ -36,6 +47,9 @@ public interface Constants {
         String LOGIN_CONFIRMED_ACC="redirect:/login?message=Account+confirmed";
         String LOGIN_TOKEN_ERROR="redirect:/login?message=Token+error";
         String UPDATE_PASSWORD = "redirect:/user/updatePassword";
+        String DICTATE_MY="redirect:/dictate/my";
+        String DICTATE_ERROR="redirect:/dictate/my?error=Something+went+wrong";
+        String DICTATE_NO_AUTHORITY="redirect:/dictate/my?error=You+don't+have+authority";
     }
 
     interface Views{
@@ -48,6 +62,12 @@ public interface Constants {
         String FORGOT_PASSWORD="forgotPassword";
         String UPDATE_PASSWORD="updatePassword";
         String MANAGE_USERS="manageUsers";
+        String DICTATES="dictates";
+        String VIEW_DICTATE="viewDictate";
+        String CREATE_DICTATE="createDictate";
+        String EDIT_DICTATE="editDictate";
+        String VIEW_CORRECTIONS="corrections";
+
     }
 
     interface Authority{
