@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.corrections.title}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.corrections.title}">title </h4>
+    </div>
+    <br>
+    <div class="alert alert-danger" th:if="${param.error != null}" th:text="${param.error}">
+        error
+    </div>
+    <div class="alert alert-info" th:if="${param.message != null}" th:text="${param.message}">
+        alert
+    </div>
+    <br>
+    <a th:href="@{/correction/create}" th:text="#{page.corrections.create}"></a>
+    <br>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th scope="col" class="text-center">Name</th>
+            <th scope="col" class="text-center">Language</th>
+            <th scope="col" class="text-center">Dictate name</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="correction : ${corrections}">
+            <td><button type="button" class="btn btn-outline-secondary" th:attr="onclick=|viewDetails()|" th:value="#{page.dictate.info}"><i class="fas fa-info"></i></button></td>
+            <td class="text-center" th:text="${correction.getName()}">name</td>
+            <td class="text-center" th:text="${correction.getDictate().getLanguage().getName()}">language</td>
+            <td class="text-center" th:text="${correction.getDictate().getName()}">dictateName</td>
+            <td class="btn-group">
+                <button type="button" class="btn btn-outline-danger"  th:attr="onclick=|checkAuthority()|" th:value="#{page.dictate.delete}"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
