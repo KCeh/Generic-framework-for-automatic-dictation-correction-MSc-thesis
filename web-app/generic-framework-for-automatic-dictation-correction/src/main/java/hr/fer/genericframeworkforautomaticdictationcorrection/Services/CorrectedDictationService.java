@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface CorrectedDictationService {
 
+    CorrectedDictation findById(Long id);
+
     CorrectedDictation findByName(String name);
 
     CorrectedDictation findByUsedOCRMethod(String usedOCRMethod);

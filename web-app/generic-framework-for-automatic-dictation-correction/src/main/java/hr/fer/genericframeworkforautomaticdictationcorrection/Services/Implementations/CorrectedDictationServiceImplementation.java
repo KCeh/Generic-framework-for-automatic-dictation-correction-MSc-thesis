@@ -10,11 +10,19 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CorrectedDictationServiceImplementation implements CorrectedDictationService {
     @Autowired
     CorrectedDictationRepository correctedDictationRepository;
+
+    @Override
+    public CorrectedDictation findById(Long id) {
+        Optional<CorrectedDictation> correctedDictation = correctedDictationRepository.findById(id);
+        if(!correctedDictation.isPresent()) return null;
+        return correctedDictation.get();
+    }
 
     @Override
     public CorrectedDictation findByName(String name) {
