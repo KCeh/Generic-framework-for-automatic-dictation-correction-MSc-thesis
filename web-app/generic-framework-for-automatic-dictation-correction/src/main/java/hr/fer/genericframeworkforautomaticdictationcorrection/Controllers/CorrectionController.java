@@ -102,7 +102,7 @@ public class CorrectionController {
             model.addAttribute("dictates", dictates);
             List<String> OCRMethods = strategyFactory.getAllMethodesNames();
             model.addAttribute("OCRMethods", OCRMethods);
-            return Constants.Views.CREATE_DICTATE;
+            return Constants.Views.CREATE_CORRECTION;
         }
 
         try {
@@ -126,7 +126,7 @@ public class CorrectionController {
             model.addAttribute("dictates", dictates);
             List<String> OCRMethods = strategyFactory.getAllMethodesNames();
             model.addAttribute("OCRMethods", OCRMethods);
-            return Constants.Views.CREATE_DICTATE;
+            return Constants.Views.CREATE_CORRECTION;
         }
 
         return Constants.Redirect.CORRECTION_MY;
