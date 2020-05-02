@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $("#error-div")[0].hidden=true;
     $("#info-div")[0].hidden=true;
+    $("#info-text-div")[0].hidden=true;
     $("#audio-upload").on("change", uploadFile);
 });
 
@@ -9,6 +10,9 @@ function uploadFile() {
     $("#info-div")[0].hidden=true;
     var data = new FormData();
     data.append('file',  $('#audio-upload')[0].files[0]);
+
+    $("#info-div")[0].innerHTML="Uploading...";
+    $("#info-div")[0].hidden=false;
 
     $.ajax({
         url: "/dictate/uploadAudio",
@@ -189,6 +193,10 @@ function saveRecording(blob) {
     file=blobToFile(blob, 'recording.wav')
     var data = new FormData();
     data.append('file',  file);
+
+    $("#info-div")[0].innerHTML="Uploading...";
+    $("#info-div")[0].hidden=false;
+
     $.ajax({
         url: "/dictate/uploadAudio",
         type: "POST",
@@ -215,6 +223,7 @@ function saveRecording(blob) {
 
 function transcribe() {
     $("#error-text-div")[0].hidden=true;
+
     var url=$("#audioUrl-input").val();
     var lang=$("#language").val();
 
@@ -228,6 +237,10 @@ function transcribe() {
         return;
     }
 
+
+    $("#info-text-div")[0].innerHTML="Processing...";
+    $("#info-text-div")[0].hidden=false;
+
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/dictate/transcribe", true);
     var params="url="+url+"&code="+lang;
@@ -237,14 +250,17 @@ function transcribe() {
     xhr.onload = function() {
         var data = JSON.parse(this.responseText);
         if(data['message'].valueOf()==="Error"){
+            $("#info-text-div")[0].hidden=true;
             $("#error-text-div")[0].innerHTML =data["error"];
             $("#error-text-div")[0].hidden=false;
         }else {
             $("#text").val(data["message"]);
+            $("#info-text-div")[0].hidden=true;
         }
     };
 
     xhr.onerror = function () {
+        $("#info-text-div")[0].hidden=true;
         $("#error-text-div")[0].innerHTML ="Something went wrong!";
         $("#error-text-div")[0].hidden=false;
     };

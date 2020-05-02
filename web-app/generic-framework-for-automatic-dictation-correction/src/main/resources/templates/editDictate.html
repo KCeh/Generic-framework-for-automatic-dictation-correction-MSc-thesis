@@ -94,6 +94,7 @@
                             <small id="text-error" class="text-danger" th:each="error: ${#fields.errors('text')}" th:text="${error}">
                                 Validation error
                             </small>
+                            <small hidden id="info-text-div" class="text-info"></small>
                             <small hidden id="error-text-div" class="text-danger"></small>
                         </div>
                     </div>
