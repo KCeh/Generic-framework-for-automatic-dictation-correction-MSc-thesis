@@ -12,5 +12,5 @@ public interface StorageService {
 
     String transcribeAudio(String url, String langCode) throws IOException;
 
-    String uploadImage();
+    String uploadImage(MultipartFile uploadedFile) throws IOException;
 }

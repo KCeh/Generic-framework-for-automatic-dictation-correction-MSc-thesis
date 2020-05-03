@@ -1,5 +1,6 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Services;
 
+import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewCorrectionForm;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
@@ -25,4 +26,8 @@ public interface CorrectedDictationService {
     void deleteCorrectedDictation(CorrectedDictation correctedDictation);
 
     List<CorrectedDictation> findByUser(User user);
+
+    CorrectedDictation addCorrection(NewCorrectionForm newCorrectionForm, User user);
+
+    CorrectedDictation editCorrection(NewCorrectionForm newCorrectionForm, User user);
 }

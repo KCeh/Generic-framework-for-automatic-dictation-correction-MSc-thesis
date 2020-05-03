@@ -112,8 +112,25 @@ public class StorageServiceImplementation implements StorageService {
     }
 
     @Override
-    public String uploadImage() {
-        return null;
+    public String uploadImage(MultipartFile uploadedFile) throws IOException {
+        Storage storage = StorageOptions.getDefaultInstance().getService();
+        String bucketName = "generic_framework_image_bucket";
+        UUID uuid = UUID.randomUUID();
+        String randomUUIDString = uuid.toString();
+        String extension = FilenameUtils.getExtension(uploadedFile.getOriginalFilename());
+
+        String fileName = randomUUIDString+'.'+extension;
+
+        BlobInfo blobInfo =
+                storage.create(
+                        BlobInfo
+                                .newBuilder(bucketName, fileName)
+                                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))))
+                                .build()
+                        , uploadedFile.getBytes()
+                );
+        System.out.println(blobInfo.getMediaLink());
+        return blobInfo.getMediaLink();
     }
 
 }

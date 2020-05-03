@@ -1,10 +1,13 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Services.Implementations;
 
+import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewCorrectionForm;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.Dictate;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Repositories.CorrectedDictationRepository;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.CorrectedDictationService;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,9 @@ import java.util.Optional;
 public class CorrectedDictationServiceImplementation implements CorrectedDictationService {
     @Autowired
     CorrectedDictationRepository correctedDictationRepository;
+
+    @Autowired
+    DictateService dictateService;
 
     @Override
     public CorrectedDictation findById(Long id) {
@@ -65,5 +71,36 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
     @Override
     public List<CorrectedDictation> findByUser(User user) {
         return correctedDictationRepository.findByUser(user);
+    }
+
+    @Override
+    public CorrectedDictation addCorrection(NewCorrectionForm newCorrectionForm, User user) {
+        CorrectedDictation correctedDictation = new CorrectedDictation();
+        correctedDictation.setUser(user);
+        correctedDictation.setUsedOCRMethod(newCorrectionForm.getUsedOCRMethod());
+        correctedDictation.setDetectedText(newCorrectionForm.getDetectedText());
+        correctedDictation.setUrlCorrectedImage(newCorrectionForm.getUrlCorrectedImage());
+        correctedDictation.setUrlOriginalImage(newCorrectionForm.getUrlOriginalImage());
+        correctedDictation.setName(newCorrectionForm.getName());
+        Dictate dictate = dictateService.findById(newCorrectionForm.getDictateId());
+        correctedDictation.setDictate(dictate);
+        return saveCorrectedDictation(correctedDictation);
+    }
+
+    @Override
+    public CorrectedDictation editCorrection(NewCorrectionForm newCorrectionForm, User user) {
+        CorrectedDictation correctedDictation = findById(newCorrectionForm.getId());
+        if (ObjectUtils.isEmpty(correctedDictation)){
+            return addCorrection(newCorrectionForm, user);
+        }
+
+        correctedDictation.setUsedOCRMethod(newCorrectionForm.getUsedOCRMethod());
+        correctedDictation.setDetectedText(newCorrectionForm.getDetectedText());
+        correctedDictation.setUrlCorrectedImage(newCorrectionForm.getUrlCorrectedImage());
+        correctedDictation.setUrlOriginalImage(newCorrectionForm.getUrlOriginalImage());
+        correctedDictation.setName(newCorrectionForm.getName());
+        Dictate dictate = dictateService.findById(newCorrectionForm.getDictateId());
+        correctedDictation.setDictate(dictate);
+        return updateCorrectedDictation(correctedDictation);
     }
 }
