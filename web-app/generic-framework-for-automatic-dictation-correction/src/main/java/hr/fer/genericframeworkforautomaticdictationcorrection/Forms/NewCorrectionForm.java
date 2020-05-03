@@ -2,6 +2,7 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.Forms;
 
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.CorrectedDictation;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -24,9 +25,9 @@ public class NewCorrectionForm {
 
     private String detectedText;
 
-    @NotNull
-    @NotEmpty
-    private String dictate;
+    @NotNull(message = "You must select dictate")
+    @Min(value = 1, message = "You must select dictate")
+    private Long dictateId;
 
     public NewCorrectionForm(){
 
@@ -39,7 +40,7 @@ public class NewCorrectionForm {
         setUrlOriginalImage(correctedDictation.getUrlOriginalImage());
         setUsedOCRMethod(correctedDictation.getUsedOCRMethod());
         setDetectedText(correctedDictation.getDetectedText());
-        setDictate(correctedDictation.getDictate().getName());
+        setDictateId(correctedDictation.getDictate().getId());
     }
 
     public Long getId() {
@@ -90,11 +91,11 @@ public class NewCorrectionForm {
         this.detectedText = detectedText;
     }
 
-    public String getDictate() {
-        return dictate;
+    public Long getDictateId() {
+        return dictateId;
     }
 
-    public void setDictate(String dictate) {
-        this.dictate = dictate;
+    public void setDictateId(Long dictateId) {
+        this.dictateId = dictateId;
     }
 }
