@@ -19,7 +19,7 @@
                 <fieldset>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" th:text="#{page.dictate.create.name}">name</span>
+                            <span class="input-group-text" th:text="#{page.corrections.create.name}">name</span>
                         </div>
                             <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Name">
                         <div class="col-sm-3">
@@ -31,7 +31,7 @@
                     <br>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-list"></i></span>
+                            <span class="input-group-text"><i class="fas fa-language"></i></span>
                         </div>
                         <select class="form-control selectpicker" id="language" th:field="*{language}">
                             <option value="" selected="selected" th:text="#{page.dictate.create.language}">lan</option>

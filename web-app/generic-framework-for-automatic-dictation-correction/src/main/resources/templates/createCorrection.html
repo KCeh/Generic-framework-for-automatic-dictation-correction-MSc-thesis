@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.corrections.create}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.corrections.create}">title </h4>
+    </div>
+    <br>
+
+    <div class="container">
+        <div id="correction" style="margin-top: 50px;" class="mainbox .col-md-6 ">
+            <form class="form-horizontal" th:action="@{/corrections/create}" th:object="${correction}" method="POST" enctype="utf8">
+                <fieldset>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" th:text="#{page.corrections.create.name}">name</span>
+                        </div>
+                        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Name">
+                        <div class="col-sm-3">
+                            <small id="name-error" class="text-danger" th:each="error: ${#fields.errors('name')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-eye"></i></span>
+                        </div>
+                        <select class="form-control selectpicker" id="language" th:field="*{usedOCRMethod}">
+                            <option value="" selected="selected" th:text="#{page.corrections.create.ocr}">ocr</option>
+                            <option th:each="method : ${OCRMethods}"
+                                    th:value="${method}"
+                                    th:text="${method}"></option>
+                        </select>
+                        <div class="col-sm-3">
+                            <small id="usedOCRMethod-error" class="text-danger" th:each="error: ${#fields.errors('usedOCRMethod')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-list"></i></span>
+                        </div>
+                        <select class="form-control selectpicker" id="dictateId" th:field="*{dictateId}">
+                            <option value="0" selected="selected" th:text="#{page.corrections.create.dictate}">dictate</option>
+                            <option th:each="dictate : ${dictates}"
+                                    th:value="${dictate.getId()}"
+                                    th:text="${dictate.getName()}"></option>
+                        </select>
+                        <div class="col-sm-3">
+                            <small id="dictate-error" class="text-danger" th:each="error: ${#fields.errors('dictateId')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+                    <br>
+                    <div class="input-group mb-3">
+                        <input type="hidden" id="originalImageUrl-input" value="" th:field="*{urlOriginalImage}">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="image-upload" name="uploadedFile" accept="image/*">
+                            <label class="custom-file-label"  th:text="#{page.corrections.create.image}">image</label>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <small hidden id="error-div" class="text-danger">
+                            </small>
+                            <small hidden id="info-div" class="text-success">
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn btn-success" type="submit" th:text="#{submit}">submit</button>
+                            <a class="btn btn-warning" th:href="@{/corrections/my}" th:text="#{back}">back</a>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="/js/correctionUtils.js"></script>
+</div>
+</body>
+</html>
