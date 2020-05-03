@@ -74,6 +74,11 @@ public abstract class VisionAPI implements OCR {
                         for (Paragraph para : block.getParagraphsList()) {
                             for (Word word : para.getWordsList()) {
                                 //get bound boxes for words
+                                List<Symbol> symbols = word.getSymbolsList();
+                                if(symbols.size()==1){
+                                    String symbol = symbols.get(0).getText();
+                                    if(symbol.equals(".") || symbol.equals("!") || symbol.equals("?")) continue;
+                                }
                                 boundingPolies.add(word.getBoundingBox());
                             };
                         }
@@ -96,8 +101,10 @@ public abstract class VisionAPI implements OCR {
     public MultipartFile drawBoundBoxesForIncorrectWords(String originalImageUrl, String originalText, String detectedText) throws IOException {
         List<List<Integer>> words = translatePoliesToCoordinates();
 
-        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ");
-        detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ");
+        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
+                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\!"," ");
+        detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
+                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\!"," ");
 
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
