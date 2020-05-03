@@ -116,11 +116,13 @@ public class CorrectionController {
             }
             String detectedText = ocr.detectText(correctionDto.getUrlOriginalImage());
             correctionDto.setDetectedText(detectedText);
-            //draw on image
-            //call storage service for corrected image
-            //set url...
+            String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
+            MultipartFile correctedImage=ocr.drawBoundBoxesForIncorrectWords(correctionDto.getUrlOriginalImage(), originalText, detectedText);
+            String correctedUrl=storageService.uploadImage(correctedImage);
+            correctionDto.setUrlCorrectedImage(correctedUrl);
             correctedDictationService.addCorrection(correctionDto, user);
         } catch (Throwable ex) {
+            System.err.println(ex.getMessage());
             model.addAttribute("correction", correctionDto);
             List<Dictate> dictates = getDictates(user);
             model.addAttribute("dictates", dictates);

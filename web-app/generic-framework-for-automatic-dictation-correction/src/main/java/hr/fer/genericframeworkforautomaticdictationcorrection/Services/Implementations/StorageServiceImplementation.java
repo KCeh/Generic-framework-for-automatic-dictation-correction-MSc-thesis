@@ -76,7 +76,7 @@ public class StorageServiceImplementation implements StorageService {
         //url = "gs://generic_framework_audio_bucket/a4213f9d-d3c6-4278-9874-66da9147c833.wav";
         String[] parts= url.split("/");
         String filename = parts[parts.length-1];
-        filename=filename.split("\\?")[0];
+        filename=filename.split("\\?")[0]; //check url in db to understand
         String uri="gs://generic_framework_audio_bucket/"+filename;
 
         String extension = filename.split("\\.")[1];
@@ -118,6 +118,9 @@ public class StorageServiceImplementation implements StorageService {
         UUID uuid = UUID.randomUUID();
         String randomUUIDString = uuid.toString();
         String extension = FilenameUtils.getExtension(uploadedFile.getOriginalFilename());
+
+        if(extension.equals(""))
+            extension="jpg";
 
         String fileName = randomUUIDString+'.'+extension;
 

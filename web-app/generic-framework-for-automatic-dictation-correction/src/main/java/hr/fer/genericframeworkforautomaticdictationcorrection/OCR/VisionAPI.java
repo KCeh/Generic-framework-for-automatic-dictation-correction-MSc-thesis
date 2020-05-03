@@ -3,13 +3,23 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.OCR;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.Image;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.mock.web.MockMultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class VisionAPI implements OCR {
+    private List<BoundingPoly> boundingPolies;
+
     @Override
     public String detectText(String imageUrl) throws IOException {
         //delete for deployment
@@ -42,6 +52,7 @@ public abstract class VisionAPI implements OCR {
 
 
         String result="";
+        boundingPolies=new ArrayList<>();
 
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create(ias)) {
             BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
@@ -59,23 +70,13 @@ public abstract class VisionAPI implements OCR {
 
                 TextAnnotation annotation = res.getFullTextAnnotation();
                 for (Page page : annotation.getPagesList()) {
-                    String pageText = "";
                     for (Block block : page.getBlocksList()) {
-                        String blockText = "";
                         for (Paragraph para : block.getParagraphsList()) {
-                            String paraText = "";
                             for (Word word : para.getWordsList()) {
-                                String wordText = "";
                                 //get bound boxes for words
-                                for (Symbol symbol : word.getSymbolsList()) {
-                                    wordText = wordText + symbol.getText();
-                                };
-                                paraText = String.format("%s %s", paraText, wordText);
-                            }
-                            // Output Example using Paragraph:
-                            blockText = blockText + paraText;
+                                boundingPolies.add(word.getBoundingBox());
+                            };
                         }
-                        pageText = pageText + blockText;
                     }
                 }
                 result=annotation.getText();
@@ -90,6 +91,88 @@ public abstract class VisionAPI implements OCR {
     @Override
     public String getName() {
         return "";
+    }
+
+    public MultipartFile drawBoundBoxesForIncorrectWords(String originalImageUrl, String originalText, String detectedText) throws IOException {
+        List<List<Integer>> words = translatePoliesToCoordinates();
+
+        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ");
+        detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ");
+
+        String[] originalWords = originalText.split("\\s+");
+        String[] detectedWords = detectedText.split("\\s+");
+
+        List<Integer> indexes = new ArrayList<>();
+        int originalLen=originalWords.length;
+        int detectedLen=detectedWords.length;
+
+        int stop=originalLen<=detectedLen ? originalLen:detectedLen;
+
+        for(int i=0;i<stop;i++){
+            if(!originalWords[i].equals(detectedWords[i]))
+                indexes.add(i);
+        }
+
+        while(stop<words.size()){
+            indexes.add(stop++);
+        }
+
+        BufferedImage img = null;
+        //BufferedImage newImage = null;
+        //handel grayscale and rgb differently?
+        try {
+            URL url = new URL(originalImageUrl);
+            img = ImageIO.read(url);
+            //newImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = img.createGraphics();
+            g2d.setColor(Color.RED);
+
+            List<Integer> word;
+            for(Integer index:indexes){
+                word=words.get(index);
+                g2d.drawRect(word.get(0), word.get(1), word.get(2), word.get(3));
+            }
+            g2d.dispose();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        //extension..
+        String[] parts= originalImageUrl.split("/");
+        String filename = parts[parts.length-1];
+        filename=filename.split("\\?")[0];
+        String extension = filename.split("\\.")[1];
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(img, extension, baos );
+        baos.flush();
+
+        MultipartFile multipartFile = new MockMultipartFile(filename, baos.toByteArray());
+
+        return multipartFile;
+    }
+
+    private List<List<Integer>> translatePoliesToCoordinates(){
+        List<List<Integer>> words = new ArrayList<>();
+
+        for(BoundingPoly poly : boundingPolies){
+            List<Integer> coordinatesForWord  = new ArrayList<>();
+            words.add(coordinatesForWord);
+
+            List<Vertex> vertices = poly.getVerticesList();
+            if(vertices.size()<4) continue;
+            int startX = vertices.get(0).getX();
+            int startY = vertices.get(0).getY();
+
+            int width=  (vertices.get(1).getX()+vertices.get(2).getX())/2 -startX ;
+            int height =  (vertices.get(2).getY()+vertices.get(3).getY())/2 -startY;
+
+            if(width*height<100) continue;
+            coordinatesForWord.add(startX);
+            coordinatesForWord.add(startY);
+            coordinatesForWord.add(width);
+            coordinatesForWord.add(height);
+        }
+        return words;
     }
 
 
