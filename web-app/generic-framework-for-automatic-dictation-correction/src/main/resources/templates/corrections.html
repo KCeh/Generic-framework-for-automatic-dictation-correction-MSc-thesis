@@ -28,22 +28,25 @@
             <th scope="col" class="text-center">Name</th>
             <th scope="col" class="text-center">Language</th>
             <th scope="col" class="text-center">Dictate name</th>
+            <th scope="col" class="text-center">OCR method</th>
             <th></th>
         </tr>
         </thead>
 
         <tbody>
         <tr th:each="correction : ${corrections}">
-            <td><button type="button" class="btn btn-outline-secondary" th:attr="onclick=|viewDetails()|" th:value="#{page.dictate.info}"><i class="fas fa-info"></i></button></td>
+            <td><button type="button" class="btn btn-outline-secondary" th:attr="onclick=|viewDetails('${correction.getId()}')|" th:value="#{page.dictate.info}"><i class="fas fa-info"></i></button></td>
             <td class="text-center" th:text="${correction.getName()}">name</td>
             <td class="text-center" th:text="${correction.getDictate().getLanguage().getName()}">language</td>
             <td class="text-center" th:text="${correction.getDictate().getName()}">dictateName</td>
+            <td class="text-center" th:text="${correction.getUsedOCRMethod()}">ocr</td>
             <td class="btn-group">
-                <button type="button" class="btn btn-outline-danger"  th:attr="onclick=|checkAuthority()|" th:value="#{page.dictate.delete}"><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-outline-danger"  th:attr="onclick=|deleteCorrection('${correction.getId()}')|" th:value="#{page.dictate.delete}"><i class="fas fa-trash-alt"></i></button>
             </td>
         </tr>
         </tbody>
     </table>
+    <script type="text/javascript" src="/js/correctionUtils.js"></script>
 </div>
 </body>
 </html>

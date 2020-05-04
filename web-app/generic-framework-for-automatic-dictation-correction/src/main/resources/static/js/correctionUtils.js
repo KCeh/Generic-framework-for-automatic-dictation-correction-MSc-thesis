@@ -37,3 +37,25 @@ function uploadFile() {
         }
     });
 }
+
+function deleteCorrection(id) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/corrections/delete", true);
+    var params="id="+id;
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send(params);
+
+    xhr.onload = function() {
+        var data = JSON.parse(this.responseText);
+        if(data['message'].valueOf()==="Error"){
+            url = "/corrections/my?error="+data["error"]
+            window.location.href = url;
+        }else {
+            window.location.href = "/corrections/my?message="+data["message"];
+        }
+    }
+
+    xhr.onerror = function () {
+        window.location.href = "/corrections/my?error=Something+went+wrong";
+    };
+}
