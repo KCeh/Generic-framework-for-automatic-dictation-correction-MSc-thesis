@@ -12,6 +12,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.GenericRespo
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -165,5 +166,27 @@ public class CorrectionController {
         }
 
         return new GenericResponse(url);
+    }
+
+    @RequestMapping(value = Constants.Paths.CORRECTION_DELETE, method = RequestMethod.POST)
+    @ResponseBody
+    public GenericResponse deleteDictate(@RequestParam("id") Long id) {
+        User user;
+        UserDetails userDetails;
+        try {
+            userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            user = userService.findByEmail(userDetails.getUsername());
+            if(user == null) throw new Exception();
+        } catch (Exception ex) {
+            return new GenericResponse("Error","Security error");
+        }
+
+        CorrectedDictation correctedDictation  = correctedDictationService.findById(id);
+        if(correctedDictation == null)
+            return new GenericResponse("Error","Something+went+wrong");
+
+
+        correctedDictationService.deleteCorrectedDictation(correctedDictation);
+        return new GenericResponse("Correction deleted successfully");
     }
 }
