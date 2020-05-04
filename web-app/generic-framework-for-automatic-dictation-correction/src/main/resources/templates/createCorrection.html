@@ -51,10 +51,12 @@
                             <span class="input-group-text"><i class="fas fa-list"></i></span>
                         </div>
                         <select class="form-control selectpicker" id="dictateId" th:field="*{dictateId}">
-                            <option value="0" selected="selected" th:text="#{page.corrections.create.dictate}">dictate</option>
+                            <option value=0 selected="selected" th:text="#{page.corrections.create.dictate}">dictate</option>
                             <option th:each="dictate : ${dictates}"
                                     th:value="${dictate.getId()}"
-                                    th:text="${dictate.getName()}"></option>
+                                    th:text="${dictate.getName()}">
+
+                            </option>
                         </select>
                         <div class="col-sm-3">
                             <small id="dictate-error" class="text-danger" th:each="error: ${#fields.errors('dictateId')}" th:text="${error}">
@@ -75,6 +77,9 @@
                             <small hidden id="error-div" class="text-danger">
                             </small>
                             <small hidden id="info-div" class="text-success">
+                            </small>
+                            <small id="url-error" class="text-danger" th:each="error: ${#fields.errors('urlOriginalImage')}" th:text="${error}">
+                                Validation error
                             </small>
                         </div>
 
