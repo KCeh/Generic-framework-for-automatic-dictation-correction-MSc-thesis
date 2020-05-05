@@ -51,8 +51,8 @@ public abstract class VisionAPI implements OCR {
         requests.add(request);
 
 
-        String result="";
-        boundingPolies=new ArrayList<>();
+        String result = "";
+        boundingPolies = new ArrayList<>();
 
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create(ias)) {
             BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
@@ -75,16 +75,18 @@ public abstract class VisionAPI implements OCR {
                             for (Word word : para.getWordsList()) {
                                 //get bound boxes for words
                                 List<Symbol> symbols = word.getSymbolsList();
-                                if(symbols.size()==1){
+                                if (symbols.size() == 1) {
                                     String symbol = symbols.get(0).getText();
-                                    if(symbol.equals(".") || symbol.equals("!") || symbol.equals("?")) continue;
+                                    if (symbol.equals(".") || symbol.equals("!") || symbol.equals("?") || symbol.equals(","))
+                                        continue;
                                 }
                                 boundingPolies.add(word.getBoundingBox());
-                            };
+                            }
+                            ;
                         }
                     }
                 }
-                result=annotation.getText();
+                result = annotation.getText();
             }
         }
 
@@ -102,27 +104,60 @@ public abstract class VisionAPI implements OCR {
         List<List<Integer>> words = translatePoliesToCoordinates();
 
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\!"," ");
+                .replaceAll("\\.", " ").replaceAll("\\?", " ")
+                .replaceAll("\\!", " ").replaceAll(",", " ");
         detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\!"," ");
+                .replaceAll("\\.", " ").replaceAll("\\?", " ")
+                .replaceAll("\\!", " ").replaceAll(",", " ");
 
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
 
         List<Integer> indexes = new ArrayList<>();
-        int originalLen=originalWords.length;
-        int detectedLen=detectedWords.length;
+        int originalLen = originalWords.length;
+        int detectedLen = detectedWords.length;
 
-        int stop=originalLen<=detectedLen ? originalLen:detectedLen;
+        int lengthDiff = detectedLen - originalLen;
 
-        for(int i=0;i<stop;i++){
-            if(!originalWords[i].equals(detectedWords[i]))
-                indexes.add(i);
+
+        if (lengthDiff == 0) {
+            for (int i = 0; i < originalLen; i++) {
+                if (!originalWords[i].equals(detectedWords[i])) {
+                    indexes.add(i);
+                }
+
+            }
+        } else if (lengthDiff > 0) {
+            int i = 0;
+            int j = 0;
+            boolean reset;
+            while (i < originalLen && j < detectedLen) {
+                if (!originalWords[i].equals(detectedWords[j])) {
+                    indexes.add(j);
+                    int oldJ = j;
+                    reset = true;
+                    while (j - i < detectedLen && j < detectedLen - 1) {
+                        j++;
+                        if (originalWords[i].equals(detectedWords[j])) {
+                            reset = false;
+                            for (int x = oldJ; x < j; x++)
+                                indexes.add(x);
+                            break;
+                        }
+                    }
+                    if (reset) j = oldJ;
+                }
+                i++;
+                j++;
+            }
+        } else { //improve
+            for (int i = 0; i < originalLen; i++) {
+                if (!originalWords[i].equals(detectedWords[i])) {
+                    indexes.add(i);
+                }
+            }
         }
 
-        while(stop<words.size()){
-            indexes.add(stop++);
-        }
 
         BufferedImage img = null;
         //BufferedImage newImage = null;
@@ -135,8 +170,8 @@ public abstract class VisionAPI implements OCR {
             g2d.setColor(Color.RED);
 
             List<Integer> word;
-            for(Integer index:indexes){
-                word=words.get(index);
+            for (Integer index : indexes) {
+                word = words.get(index);
                 g2d.drawRect(word.get(0), word.get(1), word.get(2), word.get(3));
             }
             g2d.dispose();
@@ -144,13 +179,13 @@ public abstract class VisionAPI implements OCR {
             System.err.println(e.getMessage());
         }
         //extension..
-        String[] parts= originalImageUrl.split("/");
-        String filename = parts[parts.length-1];
-        filename=filename.split("\\?")[0];
+        String[] parts = originalImageUrl.split("/");
+        String filename = parts[parts.length - 1];
+        filename = filename.split("\\?")[0];
         String extension = filename.split("\\.")[1];
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(img, extension, baos );
+        ImageIO.write(img, extension, baos);
         baos.flush();
 
         MultipartFile multipartFile = new MockMultipartFile(filename, baos.toByteArray());
@@ -158,22 +193,22 @@ public abstract class VisionAPI implements OCR {
         return multipartFile;
     }
 
-    private List<List<Integer>> translatePoliesToCoordinates(){
+    private List<List<Integer>> translatePoliesToCoordinates() {
         List<List<Integer>> words = new ArrayList<>();
 
-        for(BoundingPoly poly : boundingPolies){
-            List<Integer> coordinatesForWord  = new ArrayList<>();
+        for (BoundingPoly poly : boundingPolies) {
+            List<Integer> coordinatesForWord = new ArrayList<>();
             words.add(coordinatesForWord);
 
             List<Vertex> vertices = poly.getVerticesList();
-            if(vertices.size()<4) continue;
+            if (vertices.size() < 4) continue;
             int startX = vertices.get(0).getX();
             int startY = vertices.get(0).getY();
 
-            int width=  (vertices.get(1).getX()+vertices.get(2).getX())/2 -startX ;
-            int height =  (vertices.get(2).getY()+vertices.get(3).getY())/2 -startY;
+            int width = (vertices.get(1).getX() + vertices.get(2).getX()) / 2 - startX;
+            int height = (vertices.get(2).getY() + vertices.get(3).getY()) / 2 - startY;
 
-            if(width*height<100) continue;
+            if (width * height < 100) continue;
             coordinatesForWord.add(startX);
             coordinatesForWord.add(startY);
             coordinatesForWord.add(width);
