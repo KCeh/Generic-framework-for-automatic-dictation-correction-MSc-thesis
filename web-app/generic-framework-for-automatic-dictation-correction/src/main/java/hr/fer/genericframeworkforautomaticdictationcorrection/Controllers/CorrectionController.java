@@ -70,9 +70,15 @@ public class CorrectionController {
             return Constants.Redirect.CORRECTION_ERROR;
         }
 
-        NewCorrectionForm newCorrectionForm = new NewCorrectionForm(correctedDictation);
-        model.addAttribute("correction", newCorrectionForm);
-        return Constants.Views.VIEW_CORRECTIONS;
+        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userService.findByEmail(userDetails.getUsername());
+
+        if(!currentUser.getEmail().equals(correctedDictation.getUser().getEmail())){
+            return Constants.Redirect.CORRECTION_ERROR;
+        }
+
+        model.addAttribute("correction", correctedDictation);
+        return Constants.Views.VIEW_CORRECTION;
     }
 
     @RequestMapping(value = Constants.Paths.CORRECTION_CREATE, method = RequestMethod.GET)
