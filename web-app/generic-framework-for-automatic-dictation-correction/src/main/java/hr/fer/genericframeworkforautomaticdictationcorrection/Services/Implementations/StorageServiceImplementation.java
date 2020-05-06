@@ -136,4 +136,28 @@ public class StorageServiceImplementation implements StorageService {
         return blobInfo.getMediaLink();
     }
 
+    @Override
+    public void deleteAudio(String url) {
+        Storage storage = StorageOptions.getDefaultInstance().getService();
+        String bucketName = "generic_framework_audio_bucket";
+
+        String[] parts= url.split("/");
+        String filename = parts[parts.length-1];
+        filename=filename.split("\\?")[0]; //check url in db to understand
+
+        storage.delete(bucketName, filename);
+    }
+
+    @Override
+    public void deleteImage(String url) {
+        Storage storage = StorageOptions.getDefaultInstance().getService();
+        String bucketName = "generic_framework_image_bucket";
+
+        String[] parts= url.split("/");
+        String filename = parts[parts.length-1];
+        filename=filename.split("\\?")[0]; //check url in db to understand
+
+        storage.delete(bucketName, filename);
+    }
+
 }

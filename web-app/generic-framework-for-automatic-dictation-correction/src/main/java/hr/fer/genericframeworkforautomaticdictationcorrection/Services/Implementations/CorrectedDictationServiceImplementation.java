@@ -7,6 +7,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Repositories.CorrectedDictationRepository;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.CorrectedDictationService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateService;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Services.StorageService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
 
     @Autowired
     DictateService dictateService;
+
+    @Autowired
+    StorageService storageService;
 
     @Override
     public CorrectedDictation findById(Long id) {
@@ -65,6 +69,8 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
     @Override
     @Transactional
     public void deleteCorrectedDictation(CorrectedDictation correctedDictation) {
+        storageService.deleteImage(correctedDictation.getUrlCorrectedImage());
+        storageService.deleteImage(correctedDictation.getUrlOriginalImage());
         correctedDictationRepository.delete(correctedDictation);
     }
 

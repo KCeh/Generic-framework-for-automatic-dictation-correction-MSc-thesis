@@ -7,6 +7,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Models.User;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Repositories.DictateRepository;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.DictateService;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Services.LanguageService;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Services.StorageService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class DictateServiceImplementation implements DictateService {
 
     @Autowired
     LanguageService languageService;
+
+    @Autowired
+    StorageService storageService;
 
     @Override
     public Dictate findById(Long id) {
@@ -65,6 +69,7 @@ public class DictateServiceImplementation implements DictateService {
     @Override
     @Transactional
     public void deleteDictate(Dictate dictate) {
+        storageService.deleteAudio(dictate.getAudioUrl());
         dictateRepository.delete(dictate);
     }
 
