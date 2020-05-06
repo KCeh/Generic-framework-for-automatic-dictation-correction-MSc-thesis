@@ -6,6 +6,8 @@ public interface Constants {
         String BASE_PATH="/";
         String HOME="/home";
 
+        String ERROR="/error";
+
         String LOGIN ="/login";
         String LOGIN_WITH_PARMS = "/login*";
         String LOGOUT="/logout";
@@ -32,6 +34,10 @@ public interface Constants {
         String DICTATE_TRANSCRIBE="/dictate/transcribe";
 
         String CORRECTION_MY="/corrections/my";
+        String CORRECTION_VIEW="/corrections/view";
+        String CORRECTION_CREATE="/corrections/create";
+        String CORRECTION_UPLOAD_IMAGE="/corrections/uploadImage";
+        String CORRECTION_DELETE="/corrections/delete";
 
         String RESOURCES = "/resources/**";
         String JS = "/js/**";
@@ -50,6 +56,8 @@ public interface Constants {
         String DICTATE_MY="redirect:/dictate/my";
         String DICTATE_ERROR="redirect:/dictate/my?error=Something+went+wrong";
         String DICTATE_NO_AUTHORITY="redirect:/dictate/my?error=You+don't+have+authority";
+        String CORRECTION_ERROR="redirect:/corrections/my?error=Something+went+wrong";
+        String CORRECTION_MY="redirect:/corrections/my";
     }
 
     interface Views{
@@ -61,12 +69,15 @@ public interface Constants {
         String BAD_USER="badUser";
         String FORGOT_PASSWORD="forgotPassword";
         String UPDATE_PASSWORD="updatePassword";
+        String ERROR="error";
         String MANAGE_USERS="manageUsers";
         String DICTATES="dictates";
         String VIEW_DICTATE="viewDictate";
         String CREATE_DICTATE="createDictate";
         String EDIT_DICTATE="editDictate";
         String VIEW_CORRECTIONS="corrections";
+        String CREATE_CORRECTION="createCorrection";
+        String VIEW_CORRECTION="viewCorrection";
 
     }
 
