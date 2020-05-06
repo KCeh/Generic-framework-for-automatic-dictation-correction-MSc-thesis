@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Constants.Paths.REGISTRATION, method = RequestMethod.POST)
-    public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid NewUserForm accountDto, BindingResult result, WebRequest request, Errors errors) {
+    public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid NewUserForm accountDto, BindingResult result, HttpServletRequest request, Errors errors) {
         if (result.hasErrors()) {
             return new ModelAndView(Constants.Views.REGISTRATION, "user", accountDto);
         }
@@ -69,7 +69,7 @@ public class UserController {
             return new ModelAndView(Constants.Views.REGISTRATION, "user", accountDto);
         }
         try {
-            String appUrl = request.getContextPath();
+            String appUrl = getAppUrl(request);
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, appUrl, request.getLocale()));
         } catch (Exception ex) {
             return new ModelAndView(Constants.Views.EMAIL_ERROR, "user", accountDto);
