@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.corrections.info}">title</title>
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.corrections.info}">title </h4>
+    </div>
+    <br>
+
+    <div class="container">
+        <div id="correction" style="margin-top: 50px;" class="mainbox .col-md-6" >
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" th:text="#{page.corrections.create.name}">name</span>
+                </div>
+                <input type="text" id="name" th:field="*{correction.name}" class="form-control" placeholder="name" readonly>
+            </div>
+
+
+            <br>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-eye"></i></span>
+                </div>
+                <input type="text" id="usedOCRMethod" th:field="*{correction.usedOCRMethod}" class="form-control" placeholder="ocr" readonly>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-list"></i></span>
+                </div>
+                <input type="text" id="dictate" th:field="*{correction.dictate.name}" class="form-control" placeholder="dictate" readonly>
+            </div>
+
+            <br>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" th:text="#{page.corrections.detected}">text</span>
+                </div>
+                <textarea class="form-control" aria-label="With textarea" id="text" rows="10" cols="100"
+                          th:field="${correction.detectedText}" readonly></textarea>
+            </div>
+
+            <br>
+
+            <div class="input-group mb-3">
+                <p th:text="#{page.corrections.original}">text</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <a target="_blank" th:href="${correction.getUrlOriginalImage()}">
+                    <img th:src="${correction.getUrlOriginalImage()}" alt="original" class="img-thumbnail" height="200" width="200">
+                </a>
+            </div>
+
+
+            <div class="input-group mb-3">
+                <p th:text="#{page.corrections.corrected}">text</p>
+
+            </div>
+
+            <div class="input-group mb-3">
+                <a target="_blank" th:href="${correction.getUrlCorrectedImage()}">
+                    <img th:src="${correction.getUrlCorrectedImage()}" alt="corrected" class="img-thumbnail" height="200" width="200">
+                </a>
+            </div>
+
+
+            <br>
+            <div class="control-group">
+                <div class="controls">
+                    <a class="btn btn-warning" th:href="@{/corrections/my}" th:text="#{back}">back</a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

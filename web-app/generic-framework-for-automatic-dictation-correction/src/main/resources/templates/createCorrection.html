@@ -33,7 +33,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-eye"></i></span>
                         </div>
-                        <select class="form-control selectpicker" id="language" th:field="*{usedOCRMethod}">
+                        <select class="form-control selectpicker" id="usedOCRMethod" th:field="*{usedOCRMethod}">
                             <option value="" selected="selected" th:text="#{page.corrections.create.ocr}">ocr</option>
                             <option th:each="method : ${OCRMethods}"
                                     th:value="${method}"

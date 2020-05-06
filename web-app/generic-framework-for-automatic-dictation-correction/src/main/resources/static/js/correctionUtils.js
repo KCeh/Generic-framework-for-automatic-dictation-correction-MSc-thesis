@@ -59,3 +59,8 @@ function deleteCorrection(id) {
         window.location.href = "/corrections/my?error=Something+went+wrong";
     };
 }
+
+function viewDetails(id) {
+    var params="?id="+id;
+    window.location.href = "/corrections/view"+params;
+}
