@@ -1,0 +1,79 @@
+package hr.fer.genericframeworkforautomaticdictationcorrection.OCR;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
+
+@Component
+public class CustomOCREng implements OCR {
+    private final String NAME = "Custom OCR - English (experimental)";
+
+    @Override
+    public String detectText(String imageUrl) throws Exception {
+        URL url = new URL(imageUrl);
+        BufferedImage image = ImageIO.read(url);
+
+        String[] parts = imageUrl.split("/");
+        String filename = parts[parts.length - 1];
+        filename = filename.split("\\?")[0]; //check url in db to understand
+        String extension = filename.split("\\.")[1];
+
+        String address = "https://msc-thesis-test-web-app.ew.r.appspot.com/api/ocr";
+        URL apiUrl = new URL(address);
+        HttpURLConnection con = (HttpURLConnection) apiUrl.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "image/" + extension);
+
+        con.setDoOutput(true);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, extension, baos);
+        baos.flush();
+
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.write(baos.toByteArray());
+        out.flush();
+        out.close();
+        baos.close();
+
+        int status = con.getResponseCode();
+
+        if (status > 299)
+            throw new Exception("Error while making API call");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+        String inline="";
+        Scanner sc = new Scanner(br);
+        while (sc.hasNext()) {
+            inline += sc.nextLine();
+        }
+        sc.close();
+        br.close();
+
+        JSONParser parse = new JSONParser();
+        JSONObject jobj = (JSONObject)parse.parse(inline);
+
+        return (String) jobj.get("text");
+    }
+
+            @Override
+            public String getName () {
+                return NAME;
+            }
+
+            @Override
+            public MultipartFile drawBoundBoxesForIncorrectWords (String originalImageUrl, String originalText, String
+            detectedText) throws IOException {
+                return null;
+            }
+        }
