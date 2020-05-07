@@ -60,12 +60,12 @@
             </div>
 
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-3" th:if="${correction.getUrlCorrectedImage() != null}">
                 <p th:text="#{page.corrections.corrected}">text</p>
 
             </div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-3" th:if="${correction.getUrlCorrectedImage() != null}">
                 <a target="_blank" th:href="${correction.getUrlCorrectedImage()}">
                     <img th:src="${correction.getUrlCorrectedImage()}" alt="corrected" class="img-thumbnail" height="200" width="200">
                 </a>
