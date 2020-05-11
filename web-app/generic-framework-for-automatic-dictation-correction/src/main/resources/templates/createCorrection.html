@@ -15,7 +15,7 @@
 
     <div class="container">
         <div id="correction" style="margin-top: 50px;" class="mainbox .col-md-6 ">
-            <form class="form-horizontal" th:action="@{/corrections/create}" th:object="${correction}" method="POST" enctype="utf8">
+            <form id="form" class="form-horizontal" th:action="@{/corrections/create}" th:object="${correction}" method="POST" enctype="utf8">
                 <fieldset>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -87,10 +87,16 @@
 
 
                     <br>
+
+                    <div class="input-group mb-3">
+                        <h5 hidden id="wait-div" class="text-info">
+                        </h5>
+                    </div>
+                    <br>
                     <div class="control-group">
                         <div class="controls">
-                            <button class="btn btn-success" type="submit" th:text="#{submit}">submit</button>
-                            <a class="btn btn-warning" th:href="@{/corrections/my}" th:text="#{back}">back</a>
+                            <button class="btn btn-success" id="submit-btn" type="submit" th:text="#{submit}">submit</button>
+                            <button class="btn btn-warning" id="back-btn" th:href="@{/corrections/my}" th:text="#{back}">back</button>
                         </div>
                     </div>
 
