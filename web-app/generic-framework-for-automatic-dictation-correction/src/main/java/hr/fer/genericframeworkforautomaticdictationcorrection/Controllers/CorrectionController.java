@@ -1,5 +1,6 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.Controllers;
 
+import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.OCRException;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.UserNotFoundException;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewCorrectionForm;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewDictateFrom;
@@ -125,9 +126,22 @@ public class CorrectionController {
             correctionDto.setDetectedText(detectedText);
             String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
             MultipartFile correctedImage=ocr.drawBoundBoxesForIncorrectWords(correctionDto.getUrlOriginalImage(), originalText, detectedText);
-            String correctedUrl=storageService.uploadImage(correctedImage);
+
+            String correctedUrl=null;
+            if(correctedImage != null) //maybe method doesn't correct image
+                correctedUrl=storageService.uploadImage(correctedImage);
             correctionDto.setUrlCorrectedImage(correctedUrl);
             correctedDictationService.addCorrection(correctionDto, user);
+        }catch (OCRException ex){
+            System.err.println(ex.getMessage());
+            model.addAttribute("correction", correctionDto);
+            List<Dictate> dictates = getDictates(user);
+            model.addAttribute("dictates", dictates);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            result.rejectValue("usedOCRMethod", "error.usedOCRMethod", "Error! Use other OCR method");
+            model.addAttribute("OCRError","error");
+            return Constants.Views.CREATE_CORRECTION;
         } catch (Throwable ex) {
             System.err.println(ex.getMessage());
             model.addAttribute("correction", correctionDto);
