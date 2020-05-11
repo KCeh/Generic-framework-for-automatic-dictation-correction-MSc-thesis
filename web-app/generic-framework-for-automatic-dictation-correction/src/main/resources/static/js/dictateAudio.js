@@ -53,6 +53,7 @@ var context = null;
 var blob = null;
 
 startRecordingButton.addEventListener("click", function () {
+    stopRecordingButton.disabled=true;
     // Initialize recorder
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
     navigator.getUserMedia(
@@ -87,14 +88,16 @@ startRecordingButton.addEventListener("click", function () {
             // we connect the recorder
             mediaStream.connect(recorder);
             recorder.connect(context.destination);
+            stopRecordingButton.disabled=false;
         },
         function (e) {
             console.error(e);
+            stopRecordingButton.disabled=false;
         });
 });
 
 stopRecordingButton.addEventListener("click", function () {
-
+    startRecordingButton.disabled=true;
     // stop recording
     recorder.disconnect(context.destination);
     mediaStream.disconnect(recorder);
@@ -139,6 +142,8 @@ stopRecordingButton.addEventListener("click", function () {
     // our final blob
     blob = new Blob([view], { type: 'audio/wav' });
 
+    startRecordingButton.disabled=false;
+    stopRecordingButton.disabled=true;
     saveRecording(blob);
 
     leftchannel = [];
