@@ -64,51 +64,54 @@ public class StorageServiceImplementation implements StorageService {
                         .setCredentialsProvider(credentialsProvider)
                         .build();
 
-        SpeechClient speechClient = SpeechClient.create(speechSettings);
+        try(SpeechClient speechClient = SpeechClient.create(speechSettings)){
 
-        //SpeechClient speechClient = SpeechClient.create();
+            //SpeechClient speechClient = SpeechClient.create();
 
-        // Sample rate in Hertz of the audio data sent
-        //int sampleRateHertz = 16000;
+            // Sample rate in Hertz of the audio data sent
+            //int sampleRateHertz = 16000;
 
-        //URI not URL
-        //https://storage.cloud.google.com/generic_framework_audio_bucket/a4213f9d-d3c6-4278-9874-66da9147c833.wav
-        //url = "gs://generic_framework_audio_bucket/a4213f9d-d3c6-4278-9874-66da9147c833.wav";
-        String[] parts= url.split("/");
-        String filename = parts[parts.length-1];
-        filename=filename.split("\\?")[0]; //check url in db to understand
-        String uri="gs://generic_framework_audio_bucket/"+filename;
+            //URI not URL
+            //https://storage.cloud.google.com/generic_framework_audio_bucket/a4213f9d-d3c6-4278-9874-66da9147c833.wav
+            //url = "gs://generic_framework_audio_bucket/a4213f9d-d3c6-4278-9874-66da9147c833.wav";
+            String[] parts= url.split("/");
+            String filename = parts[parts.length-1];
+            filename=filename.split("\\?")[0]; //check url in db to understand
+            String uri="gs://generic_framework_audio_bucket/"+filename;
 
-        String extension = filename.split("\\.")[1];
+            String extension = filename.split("\\.")[1];
 
-        RecognitionConfig.AudioEncoding encoding = RecognitionConfig.AudioEncoding.LINEAR16;
-        if(extension.toLowerCase().equals("flac"))
-            encoding = RecognitionConfig.AudioEncoding.FLAC;
+            RecognitionConfig.AudioEncoding encoding = RecognitionConfig.AudioEncoding.LINEAR16;
+            if(extension.toLowerCase().equals("flac"))
+                encoding = RecognitionConfig.AudioEncoding.FLAC;
 
-        // Encoding of audio data sent. This sample sets this explicitly.
-        // This field is optional for FLAC and WAV audio formats.
-        // make sure audio is stereo
+            // Encoding of audio data sent. This sample sets this explicitly.
+            // This field is optional for FLAC and WAV audio formats.
+            // make sure audio is stereo
 
-        RecognitionConfig config =
-                RecognitionConfig.newBuilder()
-                        //.setSampleRateHertz(sampleRateHertz)
-                        .setLanguageCode(langCode)
-                        .setEncoding(encoding)
-                        .setAudioChannelCount(2)
-                        .setEnableSeparateRecognitionPerChannel(false)
-                        .build();
-        RecognitionAudio audio = RecognitionAudio.newBuilder().setUri(uri).build();
-        RecognizeRequest request =
-                RecognizeRequest.newBuilder().setConfig(config).setAudio(audio).build();
-        RecognizeResponse response = speechClient.recognize(request);
+            RecognitionConfig config =
+                    RecognitionConfig.newBuilder()
+                            //.setSampleRateHertz(sampleRateHertz)
+                            .setLanguageCode(langCode)
+                            .setEncoding(encoding)
+                            .setAudioChannelCount(2)
+                            .setEnableSeparateRecognitionPerChannel(false)
+                            .build();
+            RecognitionAudio audio = RecognitionAudio.newBuilder().setUri(uri).build();
+            RecognizeRequest request =
+                    RecognizeRequest.newBuilder().setConfig(config).setAudio(audio).build();
+            RecognizeResponse response = speechClient.recognize(request);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (SpeechRecognitionResult result : response.getResultsList()) {
-            // First alternative is the most probable result
-            SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
-            stringBuilder.append(alternative.getTranscript());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (SpeechRecognitionResult result : response.getResultsList()) {
+                // First alternative is the most probable result
+                SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+                stringBuilder.append(alternative.getTranscript());
+            }
+            return stringBuilder.toString();
+        }catch (Exception ex){
+            throw ex;
         }
-        return stringBuilder.toString();
     }
 
     @Override
@@ -138,6 +141,7 @@ public class StorageServiceImplementation implements StorageService {
 
     @Override
     public void deleteAudio(String url) {
+        if(url==null) return;
         Storage storage = StorageOptions.getDefaultInstance().getService();
         String bucketName = "generic_framework_audio_bucket";
 
@@ -150,6 +154,7 @@ public class StorageServiceImplementation implements StorageService {
 
     @Override
     public void deleteImage(String url) {
+        if(url==null) return;
         Storage storage = StorageOptions.getDefaultInstance().getService();
         String bucketName = "generic_framework_image_bucket";
 
