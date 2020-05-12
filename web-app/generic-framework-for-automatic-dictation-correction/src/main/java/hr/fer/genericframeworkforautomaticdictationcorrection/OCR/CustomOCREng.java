@@ -1,5 +1,6 @@
 package hr.fer.genericframeworkforautomaticdictationcorrection.OCR;
 
+import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.OCRException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +17,7 @@ import java.util.Scanner;
 
 @Component
 public class CustomOCREng implements OCR {
-    private final String NAME = "Custom OCR - English (experimental)";
+    private final String NAME = "Custom OCR - English (experimental, not recommended)";
 
     @Override
     public String detectText(String imageUrl) throws Exception {
@@ -48,7 +49,7 @@ public class CustomOCREng implements OCR {
         int status = con.getResponseCode();
 
         if (status > 299)
-            throw new Exception("Error while making API call");
+            throw new OCRException("Error while making API call");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
@@ -63,7 +64,11 @@ public class CustomOCREng implements OCR {
         JSONParser parse = new JSONParser();
         JSONObject jobj = (JSONObject)parse.parse(inline);
 
-        return (String) jobj.get("text");
+        String result= (String) jobj.get("text");
+
+        if(result.contains("Unable to process.")) throw new OCRException("API call couldn't return result");
+
+        return result;
     }
 
             @Override

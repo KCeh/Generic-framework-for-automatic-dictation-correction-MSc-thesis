@@ -151,7 +151,7 @@ public abstract class VisionAPI implements OCR {
                 j++;
             }
         } else { //improve
-            for (int i = 0; i < originalLen; i++) {
+            for (int i = 0; i < detectedLen; i++) {
                 if (!originalWords[i].equals(detectedWords[i])) {
                     indexes.add(i);
                 }
@@ -172,6 +172,7 @@ public abstract class VisionAPI implements OCR {
             List<Integer> word;
             for (Integer index : indexes) {
                 word = words.get(index);
+                if(word.size()<4) continue;
                 g2d.drawRect(word.get(0), word.get(1), word.get(2), word.get(3));
             }
             g2d.dispose();
