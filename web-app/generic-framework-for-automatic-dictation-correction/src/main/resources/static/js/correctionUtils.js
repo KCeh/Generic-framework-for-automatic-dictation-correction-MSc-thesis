@@ -3,6 +3,11 @@ $(document).ready(function() {
     $("#info-div")[0].hidden=true;
     $("#image-upload").on("change", uploadFile);
     $("#submit-btn").on("click", displayWait)
+    if($("#originalImageUrl-input")[0].value.length>0){
+        $("#info-div")[0].innerHTML="Image saved! No need to upload it again";
+        $("#info-div")[0].hidden=false;
+    }
+
 });
 
 function uploadFile() {
@@ -15,6 +20,7 @@ function uploadFile() {
 
     $("#info-div")[0].innerHTML="Uploading...";
     $("#info-div")[0].hidden=false;
+    $("#url-error")[0].hidden=true;
 
     $.ajax({
         url: "/corrections/uploadImage",
