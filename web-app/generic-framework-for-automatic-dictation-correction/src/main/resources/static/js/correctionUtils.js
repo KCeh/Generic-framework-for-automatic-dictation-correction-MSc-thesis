@@ -20,7 +20,10 @@ function uploadFile() {
 
     $("#info-div")[0].innerHTML="Uploading...";
     $("#info-div")[0].hidden=false;
-    $("#url-error")[0].hidden=true;
+    var urlError =$("#url-error")[0];
+    if(urlError != null){
+        urlError.hidden=true;
+    }
 
     $.ajax({
         url: "/corrections/uploadImage",
