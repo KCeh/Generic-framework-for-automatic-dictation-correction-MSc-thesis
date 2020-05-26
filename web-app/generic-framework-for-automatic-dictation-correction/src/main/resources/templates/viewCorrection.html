@@ -5,6 +5,7 @@
 
 <head>
     <title th:text="#{page.corrections.info}">title</title>
+    <link rel="stylesheet" type="text/css" href="/css/modal.css">
 </head>
 <body>
 <div layout:fragment="page_content" id="page_content">
@@ -54,9 +55,15 @@
             </div>
 
             <div class="input-group mb-3">
-                <a target="_blank" th:href="${correction.getUrlOriginalImage()}">
-                    <img th:src="${correction.getUrlOriginalImage()}" alt="original" class="img-thumbnail" height="200" width="200">
-                </a>
+                    <img id="originalImg" th:src="${correction.getUrlOriginalImage()}" alt="original" class="img-thumbnail" height="200" width="200">
+                    <div id="originalModal" class="modal">
+
+                        <span id="originalClose" class="close">&times;</span>
+
+                        <span id="originalDownload" class="download" th:value="${correction.getUrlOriginalImage()}"><i class="fa fa-download"></i></span>
+
+                        <img class="modal-content" id="img01">
+                    </div>
             </div>
 
 
@@ -66,9 +73,15 @@
             </div>
 
             <div class="input-group mb-3" th:if="${correction.getUrlCorrectedImage() != null}">
-                <a target="_blank" th:href="${correction.getUrlCorrectedImage()}">
-                    <img th:src="${correction.getUrlCorrectedImage()}" alt="corrected" class="img-thumbnail" height="200" width="200">
-                </a>
+                    <img id="correctedImg" th:src="${correction.getUrlCorrectedImage()}" alt="corrected" class="img-thumbnail" height="200" width="200">
+                    <div id="correctedModal" class="modal">
+
+                        <span id="correctedClose" class="close">&times;</span>
+
+                        <span id="correctedDownload" class="download" th:value="${correction.getUrlCorrectedImage()}"><i class="fa fa-download"></i></span>
+
+                        <img class="modal-content" id="img02">
+                    </div>
             </div>
 
 
@@ -82,6 +95,7 @@
 
         </div>
     </div>
+    <script type="text/javascript" src="/js/viewUtils.js"></script>
 </div>
 </body>
 </html>
