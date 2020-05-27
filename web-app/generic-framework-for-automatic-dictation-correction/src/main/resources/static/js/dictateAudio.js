@@ -3,6 +3,13 @@ $(document).ready(function() {
     $("#info-div")[0].hidden=true;
     $("#info-text-div")[0].hidden=true;
     $("#audio-upload").on("change", uploadFile);
+
+    if(document.title.includes("Create")){
+        if($("#audioUrl-input").val().length>0){
+            $("#info-div")[0].innerHTML="Audio saved previously!";
+            $("#info-div")[0].hidden=false;
+        }
+    }
 });
 
 function uploadFile() {

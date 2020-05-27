@@ -34,7 +34,7 @@
                             <span class="input-group-text"><i class="fas fa-eye"></i></span>
                         </div>
                         <select class="form-control selectpicker" id="usedOCRMethod" th:field="*{usedOCRMethod}">
-                            <option value="" selected="selected" th:text="#{page.corrections.create.ocr}">ocr</option>
+                            <option value="" selected="selected" th:text="#{page.corrections.create.ocr}" >ocr</option>
                             <option th:each="method : ${OCRMethods}"
                                     th:value="${method}"
                                     th:text="${method}"></option>
@@ -51,7 +51,7 @@
                             <span class="input-group-text"><i class="fas fa-list"></i></span>
                         </div>
                         <select class="form-control selectpicker" id="dictateId" th:field="*{dictateId}">
-                            <option value=0 selected="selected" th:text="#{page.corrections.create.dictate}">dictate</option>
+                            <option value=0 selected="selected" th:text="#{page.corrections.create.dictate}" >dictate</option>
                             <option th:each="dictate : ${dictates}"
                                     th:value="${dictate.getId()}"
                                     th:text="${dictate.getName()}">
