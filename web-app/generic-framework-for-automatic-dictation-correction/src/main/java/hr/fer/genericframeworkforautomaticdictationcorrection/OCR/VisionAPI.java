@@ -83,7 +83,10 @@ public abstract class VisionAPI implements OCR {
                                 List<Symbol> symbols = word.getSymbolsList();
                                 if (symbols.size() == 1) {
                                     String symbol = symbols.get(0).getText();
-                                    if (symbol.equals(".") || symbol.equals("!") || symbol.equals("?") || symbol.equals(","))
+                                    if (symbol.equals(".")  || symbol.equals("!") || symbol.equals("?")
+                                            || symbol.equals(",")
+                                            || symbol.equals("\"") || symbol.equals("\'") || symbol.equals("˝")
+                                            || symbol.equals("\n") || symbol.equals("“"))
                                         continue;
                                 }
                                 boundingPolies.add(word.getBoundingBox());
@@ -97,8 +100,8 @@ public abstract class VisionAPI implements OCR {
         }
 
         result = result.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ")
-                .replaceAll("\\!", " ").replaceAll(",", " ");
+                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
         return result;
     }
 
@@ -112,13 +115,13 @@ public abstract class VisionAPI implements OCR {
     @Override
     public String getHTMLDiff(String originalText, String detectedText){
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ")
-                .replaceAll("\\!", " ").replaceAll(",", " ");
+                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
 
         DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
+        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",detectedWords), String.join(" ",originalWords));
         String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
 
         htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#ff564a");
@@ -130,8 +133,8 @@ public abstract class VisionAPI implements OCR {
         List<List<Integer>> words = translatePoliesToCoordinates();
 
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ")
-                .replaceAll("\\!", " ").replaceAll(",", " ");
+                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
         /*
         detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ")
@@ -159,51 +162,41 @@ public abstract class VisionAPI implements OCR {
             DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
             LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
             diffMatchPatch.diffCleanupSemantic(diff);
-            /*
-            int i = 0;
-            int j = 0;
-            boolean reset;
-            while (i < originalLen && j < detectedLen) {
-                if (!originalWords[i].equals(detectedWords[j])) {
-                    indexes.add(j);
-                    int oldJ = j;
-                    reset = true;
-                    while (j - i < detectedLen && j < detectedLen - 1) {
-                        j++;
-                        if (originalWords[i].equals(detectedWords[j])) {
-                            reset = false;
-                            for (int x = oldJ; x < j; x++)
-                                indexes.add(x);
-                            break;
+
+            for(int i=0;i<detectedLen;i++){
+                indexes.add(i);
+            }
+            int lastIndex = 0;
+            for(DiffMatchPatch.Diff part : diff){
+
+                if(part.operation.equals(DiffMatchPatch.Operation.EQUAL)){
+                    String good = part.text;
+                    String[] parts = good.split("\\s+");
+                    for(String word:parts){
+                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                        if(index > -1){
+                            indexes.remove((Integer)index);
+                            lastIndex=index;
                         }
                     }
-                    if (reset) j = oldJ;
                 }
-                i++;
-                j++;
-            }*/
 
-            for(DiffMatchPatch.Diff part : diff){
                 if(part.operation.equals(DiffMatchPatch.Operation.INSERT)){
-                    int index = ArrayUtils.indexOf(detectedWords, part.text);
-                    //dijelovi nije cijela rijec
-                    if(index > -1){
-                        indexes.add(index);
+                    String good = part.text;
+                    String[] parts = good.split("\\s+");
+                    for(String word:parts){
+                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                        if(index > -1){
+                            indexes.add((Integer)index);
+                        }
                     }
-                }else if(part.operation.equals(DiffMatchPatch.Operation.DELETE)){
-                    int index = ArrayUtils.indexOf(originalWords, part.text);
-                    //dijelovi nije cijela rijec
-                    if (index == -1) continue;
-                    if (index > lengthDiff)
-                        index = lengthDiff;
-                    indexes.add(index);
                 }
+
             }
         }
 
 
         BufferedImage img = null;
-        //BufferedImage newImage = null;
         //handel grayscale and rgb differently?
         try {
             URL url = new URL(originalImageUrl);
@@ -211,6 +204,7 @@ public abstract class VisionAPI implements OCR {
             //newImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = img.createGraphics();
             g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(3));
 
             List<Integer> word;
             for (Integer index : indexes) {

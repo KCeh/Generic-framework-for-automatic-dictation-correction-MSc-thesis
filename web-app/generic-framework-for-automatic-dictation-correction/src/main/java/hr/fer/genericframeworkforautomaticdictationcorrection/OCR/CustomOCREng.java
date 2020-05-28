@@ -93,7 +93,7 @@ public class CustomOCREng implements OCR {
         String[] detectedWords = detectedText.split("\\s+");
 
         DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
+        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",detectedWords), String.join(" ",originalWords));
         String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
 
         htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#ff564a");
