@@ -4,6 +4,7 @@ import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.cloud.vision.v1.Image;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -15,7 +16,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
 public abstract class VisionAPI implements OCR {
     private List<BoundingPoly> boundingPolies;
@@ -45,7 +49,9 @@ public abstract class VisionAPI implements OCR {
 
         ImageSource imgSource = ImageSource.newBuilder().setGcsImageUri(uri).build();
         Image img = Image.newBuilder().setSource(imgSource).build();
-        Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build(); //DOCUMENT_TEXT_DETECTION -> supports handwriting
+        //DOCUMENT_TEXT_DETECTION -> supports handwriting
+        //use old model, May 15, 2020 -> new model ->works worse on test examples!? //june 30,2020 support will be dropped
+        Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).setModel("builtin/legacy_20190601" ).build();
         AnnotateImageRequest request =
                 AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).setImageContext(imageContext).build();
         requests.add(request);
@@ -127,7 +133,11 @@ public abstract class VisionAPI implements OCR {
                 }
 
             }
-        } else if (lengthDiff > 0) {
+        } else {
+            DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+            LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
+            diffMatchPatch.diffCleanupSemantic(diff);
+            /*
             int i = 0;
             int j = 0;
             boolean reset;
@@ -149,11 +159,22 @@ public abstract class VisionAPI implements OCR {
                 }
                 i++;
                 j++;
-            }
-        } else { //improve
-            for (int i = 0; i < detectedLen; i++) {
-                if (!originalWords[i].equals(detectedWords[i])) {
-                    indexes.add(i);
+            }*/
+
+            for(DiffMatchPatch.Diff part : diff){
+                if(part.operation.equals(DiffMatchPatch.Operation.INSERT)){
+                    int index = ArrayUtils.indexOf(detectedWords, part.text);
+                    //dijelovi nije cijela rijec
+                    if(index > -1){
+                        indexes.add(index);
+                    }
+                }else if(part.operation.equals(DiffMatchPatch.Operation.DELETE)){
+                    int index = ArrayUtils.indexOf(originalWords, part.text);
+                    //dijelovi nije cijela rijec
+                    if (index == -1) continue;
+                    if (index > lengthDiff)
+                        index = lengthDiff;
+                    indexes.add(index);
                 }
             }
         }
