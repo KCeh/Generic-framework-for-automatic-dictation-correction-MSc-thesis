@@ -125,6 +125,9 @@ public class CorrectionController {
             String detectedText = ocr.detectText(correctionDto.getUrlOriginalImage());
             correctionDto.setDetectedText(detectedText);
             String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
+            String htmlDiff = ocr.getHTMLDiff(originalText, detectedText);
+            correctionDto.setHTMLDiff(htmlDiff);
+
             MultipartFile correctedImage=ocr.drawBoundBoxesForIncorrectWords(correctionDto.getUrlOriginalImage(), originalText, detectedText);
 
             String correctedUrl=null;

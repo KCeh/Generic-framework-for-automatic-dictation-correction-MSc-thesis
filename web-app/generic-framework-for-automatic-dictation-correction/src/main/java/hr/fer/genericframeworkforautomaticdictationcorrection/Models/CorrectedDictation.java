@@ -25,6 +25,10 @@ public class CorrectedDictation {
     @Column( length = 100000 )
     private String detectedText;
 
+    @Lob
+    @Column( length = 100000 )
+    private String HTMLDiff;
+
     @NotEmpty
     private String usedOCRMethod;
 
@@ -74,6 +78,14 @@ public class CorrectedDictation {
 
     public void setDetectedText(String detectedText) {
         this.detectedText = detectedText;
+    }
+
+    public String getHTMLDiff() {
+        return HTMLDiff;
+    }
+
+    public void setHTMLDiff(String HTMLDiff) {
+        this.HTMLDiff = HTMLDiff;
     }
 
     public String getUsedOCRMethod() {

@@ -85,6 +85,7 @@ public class CorrectedDictationServiceImplementation implements CorrectedDictati
         correctedDictation.setUser(user);
         correctedDictation.setUsedOCRMethod(newCorrectionForm.getUsedOCRMethod());
         correctedDictation.setDetectedText(newCorrectionForm.getDetectedText());
+        correctedDictation.setHTMLDiff(newCorrectionForm.getHTMLDiff());
         correctedDictation.setUrlCorrectedImage(newCorrectionForm.getUrlCorrectedImage());
         correctedDictation.setUrlOriginalImage(newCorrectionForm.getUrlOriginalImage());
         correctedDictation.setName(newCorrectionForm.getName());

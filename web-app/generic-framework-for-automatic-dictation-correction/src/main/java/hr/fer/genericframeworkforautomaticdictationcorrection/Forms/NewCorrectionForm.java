@@ -25,6 +25,8 @@ public class NewCorrectionForm {
 
     private String detectedText;
 
+    private String HTMLDiff;
+
     @NotNull(message = "You must select dictate")
     @Min(value = 1, message = "You must select dictate")
     private Long dictateId;
@@ -89,6 +91,14 @@ public class NewCorrectionForm {
 
     public void setDetectedText(String detectedText) {
         this.detectedText = detectedText;
+    }
+
+    public String getHTMLDiff() {
+        return HTMLDiff;
+    }
+
+    public void setHTMLDiff(String HTMLDiff) {
+        this.HTMLDiff = HTMLDiff;
     }
 
     public Long getDictateId() {
