@@ -96,7 +96,7 @@ public class CustomOCREng implements OCR {
         LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",detectedWords), String.join(" ",originalWords));
         String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
 
-        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#ff564a");
+        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#66ff66");
 
         return htmlDiff;
     }

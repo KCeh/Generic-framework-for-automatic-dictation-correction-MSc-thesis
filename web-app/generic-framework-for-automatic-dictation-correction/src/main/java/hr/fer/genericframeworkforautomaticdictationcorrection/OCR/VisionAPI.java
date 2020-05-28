@@ -4,6 +4,7 @@ import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.cloud.vision.v1.Image;
+import jnr.ffi.annotations.In;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
@@ -15,8 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
@@ -124,8 +124,7 @@ public abstract class VisionAPI implements OCR {
         LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",detectedWords), String.join(" ",originalWords));
         String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
 
-        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#ff564a");
-
+        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#66ff66");
         return htmlDiff;
     }
 
@@ -149,16 +148,17 @@ public abstract class VisionAPI implements OCR {
         int detectedLen = detectedWords.length;
 
         int lengthDiff = detectedLen - originalLen;
+        Map<Integer, String> inserted= new HashMap<>();
+        Map<Integer, String> deleted = new HashMap<>();
 
-
-        if (lengthDiff == 0) {
+        /*if (lengthDiff == 0) {
             for (int i = 0; i < originalLen; i++) {
                 if (!originalWords[i].equals(detectedWords[i])) {
                     indexes.add(i);
                 }
 
             }
-        } else {
+        } else {*/
             DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
             LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
             diffMatchPatch.diffCleanupSemantic(diff);
@@ -170,7 +170,7 @@ public abstract class VisionAPI implements OCR {
             for(DiffMatchPatch.Diff part : diff){
 
                 if(part.operation.equals(DiffMatchPatch.Operation.EQUAL)){
-                    String good = part.text;
+                    String good = part.text.trim();
                     String[] parts = good.split("\\s+");
                     for(String word:parts){
                         int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
@@ -187,13 +187,28 @@ public abstract class VisionAPI implements OCR {
                     for(String word:parts){
                         int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
                         if(index > -1){
-                            indexes.add((Integer)index);
+                            inserted.put(index, word);
+                        }else {
+                            inserted.put(lastIndex+1, word);
+                        }
+                    }
+                }
+
+                if(part.operation.equals(DiffMatchPatch.Operation.DELETE)){
+                    String good = part.text;
+                    String[] parts = good.split("\\s+");
+                    for(String word:parts){
+                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                        if(index > -1){
+                            deleted.put(index, word);
+                        }else {
+                            deleted.put(lastIndex+1, word);
                         }
                     }
                 }
 
             }
-        }
+        //}
 
 
         BufferedImage img = null;
@@ -206,12 +221,57 @@ public abstract class VisionAPI implements OCR {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(3));
 
+            int avrHeight=0;
+
             List<Integer> word;
             for (Integer index : indexes) {
                 word = words.get(index);
                 if(word.size()<4) continue;
+                avrHeight+=word.get(3);
                 g2d.drawRect(word.get(0), word.get(1), word.get(2), word.get(3));
             }
+
+            if(indexes.size()!=0)
+                avrHeight/=indexes.size();
+            avrHeight/=2;
+
+            //draw words
+            g2d.setColor(Color.RED);
+            int fontSize = avrHeight>50 ? 50 : avrHeight;
+            g2d.setFont(new Font("Arial Black", Font.BOLD, fontSize));
+            int sameKey=0;
+            int lastKey=-1;
+
+            for(Map.Entry<Integer, String> entry: inserted.entrySet()){
+                int key=entry.getKey();
+                if(key==lastKey){
+                    sameKey++;
+                }else {
+                    sameKey=0;
+                }
+                lastKey=key;
+                word = words.get(key);
+                if(word.size()<4) continue;
+                g2d.drawString(entry.getValue(), word.get(0)+word.get(2)-50-sameKey*10, word.get(1)+word.get(3));
+            }
+
+            g2d.setColor(Color.GREEN);
+            sameKey=0;
+            lastKey=-1;
+
+            for(Map.Entry<Integer, String> entry: deleted.entrySet()){
+                int key=entry.getKey();
+                if(key==lastKey){
+                    sameKey++;
+                }else {
+                    sameKey=0;
+                }
+                lastKey=key;
+                word = words.get(key);
+                if(word.size()<4) continue;
+                g2d.drawString(entry.getValue(), word.get(0)+sameKey*10, word.get(1)+word.get(3));
+            }
+
             g2d.dispose();
         } catch (IOException e) {
             System.err.println(e.getMessage());
