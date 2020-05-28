@@ -49,6 +49,14 @@
             </div>
 
             <br>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <p th:text="#{page.corrections.diff}">text</p>
+                </div>
+                <p  th:utext="${correction.HTMLDiff}"></p>
+            </div>
+
+            <br>
 
             <div class="input-group mb-3">
                 <p th:text="#{page.corrections.original}">text</p>
