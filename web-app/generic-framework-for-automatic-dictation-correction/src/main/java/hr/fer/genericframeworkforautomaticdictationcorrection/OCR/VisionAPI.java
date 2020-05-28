@@ -96,6 +96,9 @@ public abstract class VisionAPI implements OCR {
             }
         }
 
+        result = result.trim().replaceAll("\n", " ").replaceAll("\r", " ")
+                .replaceAll("\\.", " ").replaceAll("\\?", " ")
+                .replaceAll("\\!", " ").replaceAll(",", " ");
         return result;
     }
 
@@ -106,15 +109,34 @@ public abstract class VisionAPI implements OCR {
         return "";
     }
 
+    @Override
+    public String getHTMLDiff(String originalText, String detectedText){
+        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
+                .replaceAll("\\.", " ").replaceAll("\\?", " ")
+                .replaceAll("\\!", " ").replaceAll(",", " ");
+        String[] originalWords = originalText.split("\\s+");
+        String[] detectedWords = detectedText.split("\\s+");
+
+        DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
+        String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
+
+        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#ff564a");
+
+        return htmlDiff;
+    }
+
     public MultipartFile drawBoundBoxesForIncorrectWords(String originalImageUrl, String originalText, String detectedText) throws IOException {
         List<List<Integer>> words = translatePoliesToCoordinates();
 
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ")
                 .replaceAll("\\!", " ").replaceAll(",", " ");
+        /*
         detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ")
                 .replaceAll("\\!", " ").replaceAll(",", " ");
+                */
 
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
