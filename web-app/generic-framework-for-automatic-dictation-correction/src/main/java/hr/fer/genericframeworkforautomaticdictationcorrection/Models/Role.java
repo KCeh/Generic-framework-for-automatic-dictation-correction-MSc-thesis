@@ -40,4 +40,13 @@ public class Role {
     public void setUsers(Collection<User> users) {
         this.users = users;
     }
+
+    @Override
+    public boolean equals(Object object){
+        if(this==object)
+            return true;
+
+        Role role = (Role) object;
+        return this.getName().equals(role.getName());
+    }
 }
