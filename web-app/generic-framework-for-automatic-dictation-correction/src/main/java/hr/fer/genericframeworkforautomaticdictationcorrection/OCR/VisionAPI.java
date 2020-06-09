@@ -4,7 +4,6 @@ import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.cloud.vision.v1.Image;
-import jnr.ffi.annotations.In;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
@@ -86,7 +85,7 @@ public abstract class VisionAPI implements OCR {
                                     if (symbol.equals(".")  || symbol.equals("!") || symbol.equals("?")
                                             || symbol.equals(",")
                                             || symbol.equals("\"") || symbol.equals("\'") || symbol.equals("˝")
-                                            || symbol.equals("\n") || symbol.equals("“"))
+                                            || symbol.equals("\n") || symbol.equals("“") || symbol.equals("-"))
                                         continue;
                                 }
                                 boundingPolies.add(word.getBoundingBox());
@@ -101,7 +100,7 @@ public abstract class VisionAPI implements OCR {
 
         result = result.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ").replaceAll("-"," ");
         return result;
     }
 
@@ -187,6 +186,7 @@ public abstract class VisionAPI implements OCR {
                     for(String word:parts){
                         int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
                         if(index > -1){
+							//POPRAVITI ne MAPA, ne može biti više toga za isti index
                             inserted.put(index, word);
                         }else {
                             inserted.put(lastIndex+1, word);
@@ -237,7 +237,8 @@ public abstract class VisionAPI implements OCR {
 
             //draw words
             g2d.setColor(Color.RED);
-            int fontSize = avrHeight>50 ? 50 : avrHeight;
+            //int fontSize = avrHeight>50 ? 50 : avrHeight;
+            int fontSize = avrHeight;
             g2d.setFont(new Font("Arial Black", Font.BOLD, fontSize));
             int sameKey=0;
             int lastKey=-1;
