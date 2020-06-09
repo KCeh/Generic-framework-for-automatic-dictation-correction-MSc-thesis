@@ -5,7 +5,9 @@ $(document).ready(function () {
     });
 
     $(":password").keyup(function () {
-        if ($("#password").val() != $("#matchPassword").val()) {
+        if ($("#password").val().length<8){
+            $("#globalError").show().html("8 characters minimum");
+        }else if ($("#password").val() != $("#matchPassword").val()) {
             $("#globalError").show().html("Passwords do not match!");
         } else {
             $("#globalError").html("").hide();
@@ -17,6 +19,10 @@ function savePass(event) {
     event.preventDefault();
     if ($("#password").val() != $("#matchPassword").val()) {
         $("#globalError").show().html("Passwords do not match!");
+        return;
+    }
+    if($("#password").val().length<8){
+        $("#globalError").show().html("8 characters minimum");
         return;
     }
     var formData = $('form').serialize();
