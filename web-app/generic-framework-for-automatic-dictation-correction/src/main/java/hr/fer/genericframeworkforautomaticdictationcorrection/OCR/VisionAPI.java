@@ -50,7 +50,7 @@ public abstract class VisionAPI implements OCR {
         Image img = Image.newBuilder().setSource(imgSource).build();
         //DOCUMENT_TEXT_DETECTION -> supports handwriting
         //use old model, May 15, 2020 -> new model ->works worse on test examples!? //june 30,2020 support will be dropped
-        Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).setModel("builtin/legacy_20190601" ).build();
+        Feature feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).setModel("builtin/legacy_20190601").build();
         AnnotateImageRequest request =
                 AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).setImageContext(imageContext).build();
         requests.add(request);
@@ -82,7 +82,7 @@ public abstract class VisionAPI implements OCR {
                                 List<Symbol> symbols = word.getSymbolsList();
                                 if (symbols.size() == 1) {
                                     String symbol = symbols.get(0).getText();
-                                    if (symbol.equals(".")  || symbol.equals("!") || symbol.equals("?")
+                                    if (symbol.equals(".") || symbol.equals("!") || symbol.equals("?")
                                             || symbol.equals(",")
                                             || symbol.equals("\"") || symbol.equals("\'") || symbol.equals("˝")
                                             || symbol.equals("\n") || symbol.equals("“") || symbol.equals("-"))
@@ -100,7 +100,7 @@ public abstract class VisionAPI implements OCR {
 
         result = result.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ").replaceAll("-"," ");
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ").replaceAll("-", " ");
         return result;
     }
 
@@ -112,18 +112,18 @@ public abstract class VisionAPI implements OCR {
     }
 
     @Override
-    public String getHTMLDiff(String originalText, String detectedText){
+    public String getHTMLDiff(String originalText, String detectedText) {
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ");
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
 
         DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",detectedWords), String.join(" ",originalWords));
+        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ", detectedWords), String.join(" ", originalWords));
         String htmlDiff = diffMatchPatch.diffPrettyHtml(diff);
 
-        htmlDiff=htmlDiff.replaceAll("#ffe6e6","#ff564a").replaceAll("#e6ffe6","#66ff66");
+        htmlDiff = htmlDiff.replaceAll("#ffe6e6", "#ff564a").replaceAll("#e6ffe6", "#66ff66");
         return htmlDiff;
     }
 
@@ -132,7 +132,7 @@ public abstract class VisionAPI implements OCR {
 
         originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(","," ");
+                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ");
         /*
         detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
                 .replaceAll("\\.", " ").replaceAll("\\?", " ")
@@ -146,73 +146,92 @@ public abstract class VisionAPI implements OCR {
         int originalLen = originalWords.length;
         int detectedLen = detectedWords.length;
 
-        int lengthDiff = detectedLen - originalLen;
-        Map<Integer, String> inserted= new HashMap<>();
-        Map<Integer, String> deleted = new HashMap<>();
+        Map<Integer, List<String>> inserted = new HashMap<>();
+        Map<Integer, List<String>> deleted = new HashMap<>();
 
-        /*if (lengthDiff == 0) {
-            for (int i = 0; i < originalLen; i++) {
-                if (!originalWords[i].equals(detectedWords[i])) {
-                    indexes.add(i);
+        DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+        LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ", originalWords), String.join(" ", detectedWords));
+        diffMatchPatch.diffCleanupSemantic(diff);
+
+        for (int i = 0; i < detectedLen; i++) {
+            indexes.add(i);
+        }
+        int lastIndex = 0;
+        for (DiffMatchPatch.Diff part : diff) {
+
+            if (part.operation.equals(DiffMatchPatch.Operation.EQUAL)) {
+                String good = part.text.trim();
+                String[] parts = good.split("\\s+");
+                for (String word : parts) {
+                    int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                    if (index > -1) {
+                        indexes.remove((Integer) index);
+                        lastIndex = index;
+                    }
                 }
-
             }
-        } else {*/
-            DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-            LinkedList<DiffMatchPatch.Diff> diff = diffMatchPatch.diffMain(String.join(" ",originalWords), String.join(" ",detectedWords));
-            diffMatchPatch.diffCleanupSemantic(diff);
 
-            for(int i=0;i<detectedLen;i++){
-                indexes.add(i);
-            }
-            int lastIndex = 0;
-            for(DiffMatchPatch.Diff part : diff){
-
-                if(part.operation.equals(DiffMatchPatch.Operation.EQUAL)){
-                    String good = part.text.trim();
-                    String[] parts = good.split("\\s+");
-                    for(String word:parts){
-                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
-                        if(index > -1){
-                            indexes.remove((Integer)index);
-                            lastIndex=index;
+            if (part.operation.equals(DiffMatchPatch.Operation.INSERT)) {
+                String good = part.text;
+                String[] parts = good.split("\\s+");
+                for (String word : parts) {
+                    int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                    if (index > -1) {
+                        if (inserted.containsKey(index)) {
+                            List<String> listOfCorrections = inserted.get(index);
+                            listOfCorrections.add(word);
+                        } else {
+                            List<String> listOfCorrections = new ArrayList<>();
+                            listOfCorrections.add(word);
+                            inserted.put(index, listOfCorrections);
+                        }
+                    } else {
+                        index=lastIndex;
+                        if (inserted.containsKey(index + 1)) {
+                            List<String> listOfCorrections = inserted.get(index + 1);
+                            listOfCorrections.add(word);
+                        } else {
+                            List<String> listOfCorrections = new ArrayList<>();
+                            listOfCorrections.add(word);
+                            inserted.put(index + 1, listOfCorrections);
                         }
                     }
                 }
-
-                if(part.operation.equals(DiffMatchPatch.Operation.INSERT)){
-                    String good = part.text;
-                    String[] parts = good.split("\\s+");
-                    for(String word:parts){
-                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
-                        if(index > -1){
-							//POPRAVITI ne MAPA, ne može biti više toga za isti index
-                            inserted.put(index, word);
-                        }else {
-                            inserted.put(lastIndex+1, word);
-                        }
-                    }
-                }
-
-                if(part.operation.equals(DiffMatchPatch.Operation.DELETE)){
-                    String good = part.text;
-                    String[] parts = good.split("\\s+");
-                    for(String word:parts){
-                        int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
-                        if(index > -1){
-                            deleted.put(index, word);
-                        }else {
-                            deleted.put(lastIndex+1, word);
-                        }
-                    }
-                }
-
             }
+
+            if (part.operation.equals(DiffMatchPatch.Operation.DELETE)) {
+                String good = part.text;
+                String[] parts = good.split("\\s+");
+                for (String word : parts) {
+                    int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
+                    if (index > -1) {
+                        if (deleted.containsKey(index)) {
+                            List<String> listOfCorrections = deleted.get(index);
+                            listOfCorrections.add(word);
+                        } else {
+                            List<String> listOfCorrections = new ArrayList<>();
+                            listOfCorrections.add(word);
+                            deleted.put(index, listOfCorrections);
+                        }
+                    } else {
+                        index=lastIndex;
+                        if (deleted.containsKey(index + 1)) {
+                            List<String> listOfCorrections = deleted.get(index + 1);
+                            listOfCorrections.add(word);
+                        } else {
+                            List<String> listOfCorrections = new ArrayList<>();
+                            listOfCorrections.add(word);
+                            deleted.put(index + 1, listOfCorrections);
+                        }
+                    }
+                }
+            }
+
+        }
         //}
 
 
         BufferedImage img = null;
-        //handel grayscale and rgb differently?
         try {
             URL url = new URL(originalImageUrl);
             img = ImageIO.read(url);
@@ -221,56 +240,49 @@ public abstract class VisionAPI implements OCR {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(3));
 
-            int avrHeight=0;
+            int avrHeight = 0;
 
             List<Integer> word;
             for (Integer index : indexes) {
                 word = words.get(index);
-                if(word.size()<4) continue;
-                avrHeight+=word.get(3);
+                if (word.size() < 4) continue;
+                avrHeight += word.get(3);
                 g2d.drawRect(word.get(0), word.get(1), word.get(2), word.get(3));
             }
 
-            if(indexes.size()!=0)
-                avrHeight/=indexes.size();
-            avrHeight/=2;
+            if (indexes.size() != 0)
+                avrHeight /= indexes.size();
+            else
+                avrHeight = 50;
+            avrHeight /= 2;
 
             //draw words
             g2d.setColor(Color.RED);
             //int fontSize = avrHeight>50 ? 50 : avrHeight;
             int fontSize = avrHeight;
             g2d.setFont(new Font("Arial Black", Font.BOLD, fontSize));
-            int sameKey=0;
-            int lastKey=-1;
 
-            for(Map.Entry<Integer, String> entry: inserted.entrySet()){
-                int key=entry.getKey();
-                if(key==lastKey){
-                    sameKey++;
-                }else {
-                    sameKey=0;
+            for (Map.Entry<Integer, List<String>> entry : inserted.entrySet()) {
+                word = words.get(entry.getKey());
+                if (word.size() < 4) continue;
+                int i=0;
+                for(String correct:entry.getValue()){
+                    g2d.drawString(correct, word.get(0) + word.get(2) - 50 - i * fontSize, word.get(1) + word.get(3));
+                    i++;
                 }
-                lastKey=key;
-                word = words.get(key);
-                if(word.size()<4) continue;
-                g2d.drawString(entry.getValue(), word.get(0)+word.get(2)-50-sameKey*10, word.get(1)+word.get(3));
             }
 
             g2d.setColor(Color.GREEN);
-            sameKey=0;
-            lastKey=-1;
 
-            for(Map.Entry<Integer, String> entry: deleted.entrySet()){
-                int key=entry.getKey();
-                if(key==lastKey){
-                    sameKey++;
-                }else {
-                    sameKey=0;
+
+            for (Map.Entry<Integer, List<String>> entry : deleted.entrySet()) {
+                word = words.get(entry.getKey());
+                if (word.size() < 4) continue;
+                int i=0;
+                for(String correct:entry.getValue()){
+                    g2d.drawString(correct, word.get(0) + i * fontSize, word.get(1) + word.get(3));
+                    i++;
                 }
-                lastKey=key;
-                word = words.get(key);
-                if(word.size()<4) continue;
-                g2d.drawString(entry.getValue(), word.get(0)+sameKey*10, word.get(1)+word.get(3));
             }
 
             g2d.dispose();
