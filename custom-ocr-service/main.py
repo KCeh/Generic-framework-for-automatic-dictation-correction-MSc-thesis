@@ -27,8 +27,9 @@ def do_ocr():
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     cv2.imwrite(path,img)
     data = {}
-    text = ocr.ocr(path)
+    text, coordinates = ocr.ocr(path)
     data["text"] = text
+    data["coordinates"]=coordinates
     response = json.dumps(data)
 
     return Response(response=response, status=200, mimetype="application/json")

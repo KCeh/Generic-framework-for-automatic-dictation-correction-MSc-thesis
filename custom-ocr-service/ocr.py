@@ -27,10 +27,10 @@ def line_array(array):
         e_a, e_p = endline(y, array)
         if s_a >= 7 and s_p >= 5:
             list_x_upper.append(y)
-            # bin_img[y][:] = 255
+
         if e_a >= 5 and e_p >= 7:
             list_x_lower.append(y)
-            # bin_img[y][:] = 255
+
     return list_x_upper, list_x_lower
 
 
@@ -126,7 +126,6 @@ def end_wrd_dtct(lines, i, bin_img, mean_lttr_width):
             if bin_img[y][x] == 255:
                 count_y[x] += 1
     end_lines = end_line_array(count_y, int(mean_lttr_width))
-    # print(end_lines)
     endlines = refine_endword(end_lines)
     for x in endlines:
         final_thr[lines[i][0]:lines[i][1], x] = 255
@@ -140,7 +139,6 @@ def letter_seg(lines_img, x_lines, i):
     letter_img = []
     letter_k = []
 
-    #chalu_img, contours, hierarchy = cv2.findContours(copy_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     contours, hierarchy = cv2.findContours(
         copy_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for cnt in contours:
@@ -150,7 +148,8 @@ def letter_seg(lines_img, x_lines, i):
             letter_k.append((x, y, w, h))
 
     letter = sorted(letter_k, key=lambda l: l[0])
-    # print(letter)
+
+    coordinates=[]
 
     word = 1
     letter_index = 0
@@ -174,7 +173,8 @@ def letter_seg(lines_img, x_lines, i):
             cv2.imwrite('/tmp/'+str(i+1)+'_'+str(word) +
                         '_'+str(letter_index)+'.png', letter_img)
             # print(letter[e][0],x_linescopy[0], word)
-        print("letter written")
+        #print("letter written")
+    return coordinates
 
 
 
@@ -218,19 +218,11 @@ def init():
 
 def ocr(filename):
     dir="/tmp"
+    pattern = re.compile("[0-9]+_[0-9]+_[0-9]+.png")
 
-    '''
-    #better solution?
-    try:
-        shutil.rmtree(dir)
-    except FileNotFoundError:
-        print("Directory %s doesn't exist! Creating..." % dir)
-
-    try:
-        os.mkdir(dir)
-    except OSError:
-        print("Creation of the directory %s failed" % dir)
-    '''
+    filelist = [f for f in os.listdir(dir) if pattern.search(f)]
+    for f in filelist:
+        os.remove(os.path.join(dir, f))
 
     src_img = cv2.imread(filename, 1)
     copy = src_img.copy()
@@ -307,10 +299,15 @@ def ocr(filename):
 
     print(x_lines)
 
-    for i in range(len(lines)):
-        letter_seg(lines_img, x_lines, i)
 
-    pattern = re.compile("[0-9]+_[0-9]+_[0-9]+.png")
+    coordinates=[]
+    for i in range(len(lines)):
+        currentCoordinates=letter_seg(lines_img, x_lines, i)
+        coordinates.extend(currentCoordinates)
+    
+    
+
+
     letters = []
     for (dirpath, dirnames, filenames) in os.walk(dir):
         for filename in filenames:
@@ -346,13 +343,13 @@ def ocr(filename):
     respones = predict_json(project="msc-thesis-test-web-app",
                             region="europe-west1", model="predict_letters", instances=instances)
     
-    print(respones)
+    #print(respones)
     word_index = 1
     line_index = 1
     i=0
     output = ""
     for letter in letters:
-        if word_index != int(letter[1]):
+        if word_index < int(letter[1]):
             word_index += 1
             output += " "
         if line_index < int(letter[0]):
@@ -361,4 +358,4 @@ def ocr(filename):
             output += " "
         output += class_names[np.argmax(respones[i]['dense_1'])]
         i+=1
-    return output
+    return output, coordinates
