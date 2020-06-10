@@ -38,6 +38,7 @@ public interface Constants {
         String CORRECTION_CREATE="/corrections/create";
         String CORRECTION_UPLOAD_IMAGE="/corrections/uploadImage";
         String CORRECTION_DELETE="/corrections/delete";
+        String CORRECTION_EDIT="/corrections/edit";
 
         String RESOURCES = "/resources/**";
         String JS = "/js/**";
@@ -78,7 +79,7 @@ public interface Constants {
         String VIEW_CORRECTIONS="corrections";
         String CREATE_CORRECTION="createCorrection";
         String VIEW_CORRECTION="viewCorrection";
-
+        String EDIT_CORRECTION="editCorrection";
     }
 
     interface Authority{
