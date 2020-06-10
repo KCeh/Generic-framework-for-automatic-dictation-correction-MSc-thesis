@@ -57,6 +57,8 @@ public class CorrectionController {
         org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userService.findByEmail(userDetails.getUsername());
         List<CorrectedDictation> correctedDictationList = correctedDictationService.findByUser(currentUser);
+        //List<CorrectedDictation> correctedDictationList = correctedDictationService.findAll();
+
 
         model.addAttribute("corrections",correctedDictationList);
 
@@ -74,9 +76,9 @@ public class CorrectionController {
         org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userService.findByEmail(userDetails.getUsername());
 
-        if(!currentUser.getEmail().equals(correctedDictation.getUser().getEmail())){
+        /*if(!currentUser.getEmail().equals(correctedDictation.getUser().getEmail())){
             return Constants.Redirect.CORRECTION_ERROR;
-        }
+        }*/
 
         model.addAttribute("correction", correctedDictation);
         return Constants.Views.VIEW_CORRECTION;
@@ -211,5 +213,74 @@ public class CorrectionController {
 
         correctedDictationService.deleteCorrectedDictation(correctedDictation);
         return new GenericResponse("Correction deleted successfully");
+    }
+
+    @RequestMapping(value = Constants.Paths.CORRECTION_EDIT, method = RequestMethod.GET)
+    public String editCorrection(@RequestParam int id, Model model) {
+        CorrectedDictation correctedDictation = correctedDictationService.findById((long)id);
+        NewCorrectionForm newCorrectionForm = new NewCorrectionForm(correctedDictation);
+
+        if(ObjectUtils.isEmpty(correctedDictation)){
+            return Constants.Redirect.CORRECTION_ERROR;
+        }
+
+        List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+        model.addAttribute("OCRMethods", OCRMethods);
+
+        model.addAttribute("correction", newCorrectionForm);
+        return Constants.Views.EDIT_CORRECTION;
+    }
+
+    @RequestMapping(value = Constants.Paths.CORRECTION_EDIT, method = RequestMethod.POST)
+    public String editCorrection(@ModelAttribute("correction") @Valid NewCorrectionForm correctionDto, BindingResult result, Model model, Errors errors) {
+        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByEmail(userDetails.getUsername());
+
+        if (result.hasErrors()) {
+            model.addAttribute("correction", correctionDto);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            return Constants.Views.EDIT_CORRECTION;
+        }
+
+        try {
+            if (ObjectUtils.isEmpty(user)) {
+                throw new UserNotFoundException("User not found");
+            }
+            OCR ocr = strategyFactory.getMethod(correctionDto.getUsedOCRMethod());
+            if(ObjectUtils.isEmpty(ocr)){
+                System.err.println("OCR is null");
+                throw new Exception("OCR is null");
+            }
+            String detectedText = ocr.detectText(correctionDto.getUrlOriginalImage());
+            correctionDto.setDetectedText(detectedText);
+            String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
+            String htmlDiff = ocr.getHTMLDiff(originalText, detectedText);
+            correctionDto.setHTMLDiff(htmlDiff);
+
+            MultipartFile correctedImage=ocr.drawBoundBoxesForIncorrectWords(correctionDto.getUrlOriginalImage(), originalText, detectedText);
+
+            String correctedUrl=null;
+            if(correctedImage != null) //maybe method doesn't correct image
+                correctedUrl=storageService.uploadImage(correctedImage);
+            correctionDto.setUrlCorrectedImage(correctedUrl);
+            correctedDictationService.editCorrection(correctionDto, user);
+        }catch (OCRException ex){
+            System.err.println(ex.getMessage());
+            model.addAttribute("correction", correctionDto);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            result.rejectValue("usedOCRMethod", "error.usedOCRMethod", "Error! Use other OCR method");
+            model.addAttribute("OCRError","error");
+            return Constants.Views.EDIT_CORRECTION;
+        } catch (Throwable ex) {
+            System.err.println(ex.getMessage());
+            model.addAttribute("correction", correctionDto);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            return Constants.Views.EDIT_CORRECTION;
+        }
+
+        return Constants.Redirect.CORRECTION_MY;
     }
 }
