@@ -97,6 +97,7 @@
             <div class="control-group">
                 <div class="controls">
                     <a class="btn btn-warning" th:href="@{/corrections/my}" th:text="#{back}">back</a>
+                    <a class="btn btn-info" th:href="@{/corrections/edit(id=${correction.getId()})}" th:text="#{page.corrections.recorrect}">recorrect</a>
                 </div>
             </div>
 
