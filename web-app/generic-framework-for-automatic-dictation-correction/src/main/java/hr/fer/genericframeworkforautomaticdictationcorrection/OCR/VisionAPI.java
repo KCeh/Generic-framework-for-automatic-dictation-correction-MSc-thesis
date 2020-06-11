@@ -97,10 +97,8 @@ public abstract class VisionAPI implements OCR {
                 result = annotation.getText();
             }
         }
-
-        result = result.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ").replaceAll("-", " ");
+        
+        result=result.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
         return result;
     }
 
@@ -113,9 +111,7 @@ public abstract class VisionAPI implements OCR {
 
     @Override
     public String getHTMLDiff(String originalText, String detectedText) {
-        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ");
+        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
 
@@ -129,15 +125,7 @@ public abstract class VisionAPI implements OCR {
 
     public MultipartFile drawBoundBoxesForIncorrectWords(String originalImageUrl, String originalText, String detectedText) throws IOException {
         List<List<Integer>> words = translatePoliesToCoordinates();
-
-        originalText = originalText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ").replaceAll("\\'", " ")
-                .replaceAll("\\!", " ").replaceAll("\\,", " ").replaceAll(",", " ");
-        /*
-        detectedText = detectedText.trim().replaceAll("\n", " ").replaceAll("\r", " ")
-                .replaceAll("\\.", " ").replaceAll("\\?", " ")
-                .replaceAll("\\!", " ").replaceAll(",", " ");
-                */
+        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
 
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
@@ -254,13 +242,13 @@ public abstract class VisionAPI implements OCR {
                 avrHeight /= indexes.size();
             else
                 avrHeight = 50;
-            avrHeight /= 2;
+            avrHeight *= 0.4;
 
             //draw words
             g2d.setColor(Color.RED);
-            //int fontSize = avrHeight>50 ? 50 : avrHeight;
-            int fontSize = avrHeight;
-            g2d.setFont(new Font("Arial Black", Font.BOLD, fontSize));
+            int fontSize = avrHeight>50 ? 50 : avrHeight;
+            //int fontSize = avrHeight;
+            g2d.setFont(new Font("Arial Black", Font.PLAIN, fontSize));
 
             for (Map.Entry<Integer, List<String>> entry : inserted.entrySet()) {
                 word = words.get(entry.getKey());
