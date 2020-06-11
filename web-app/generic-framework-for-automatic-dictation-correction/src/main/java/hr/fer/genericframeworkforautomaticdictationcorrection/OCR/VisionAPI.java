@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
 public abstract class VisionAPI implements OCR {
@@ -97,8 +98,8 @@ public abstract class VisionAPI implements OCR {
                 result = annotation.getText();
             }
         }
-        
-        result=result.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
+
+        result=result.trim().replaceAll("[^a-zA-Z0-9ČčĆćŠšĐđŽž]+"," ").replaceAll("\\s{2,}", " ");
         return result;
     }
 
@@ -111,7 +112,7 @@ public abstract class VisionAPI implements OCR {
 
     @Override
     public String getHTMLDiff(String originalText, String detectedText) {
-        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
+        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9ČčĆćŠšĐđŽž]+"," ").replaceAll("\\s{2,}", " ");
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
 
@@ -125,7 +126,7 @@ public abstract class VisionAPI implements OCR {
 
     public MultipartFile drawBoundBoxesForIncorrectWords(String originalImageUrl, String originalText, String detectedText) throws IOException {
         List<List<Integer>> words = translatePoliesToCoordinates();
-        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9]+"," ").replaceAll("\\s{2,}", " ");
+        originalText = originalText.trim().replaceAll("[^a-zA-Z0-9ČčĆćŠšĐđŽž]+"," ").replaceAll("\\s{2,}", " ");
 
         String[] originalWords = originalText.split("\\s+");
         String[] detectedWords = detectedText.split("\\s+");
