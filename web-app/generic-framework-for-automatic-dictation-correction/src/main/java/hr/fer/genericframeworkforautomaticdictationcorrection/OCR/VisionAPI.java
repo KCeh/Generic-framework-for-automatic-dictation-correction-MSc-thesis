@@ -145,7 +145,7 @@ public abstract class VisionAPI implements OCR {
         for (int i = 0; i < detectedLen; i++) {
             indexes.add(i);
         }
-        int lastIndex = 0;
+        int lastIndex = -1;
         for (DiffMatchPatch.Diff part : diff) {
 
             if (part.operation.equals(DiffMatchPatch.Operation.EQUAL)) {
@@ -161,7 +161,7 @@ public abstract class VisionAPI implements OCR {
             }
 
             if (part.operation.equals(DiffMatchPatch.Operation.INSERT)) {
-                String good = part.text;
+                String good = part.text.trim();
                 String[] parts = good.split("\\s+");
                 for (String word : parts) {
                     int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
@@ -189,7 +189,7 @@ public abstract class VisionAPI implements OCR {
             }
 
             if (part.operation.equals(DiffMatchPatch.Operation.DELETE)) {
-                String good = part.text;
+                String good = part.text.trim();
                 String[] parts = good.split("\\s+");
                 for (String word : parts) {
                     int index = ArrayUtils.indexOf(detectedWords, word, lastIndex);
@@ -204,6 +204,15 @@ public abstract class VisionAPI implements OCR {
                         }
                     } else {
                         index=lastIndex;
+                        if(index>=0){
+                            String newWord=detectedWords[index]+word;
+                            if(ArrayUtils.indexOf(originalWords, newWord)>-1){
+                                indexes.add(index);
+                                if(index>0)
+                                    index--;
+                            }
+                        }
+
                         if (deleted.containsKey(index + 1)) {
                             List<String> listOfCorrections = deleted.get(index + 1);
                             listOfCorrections.add(word);
