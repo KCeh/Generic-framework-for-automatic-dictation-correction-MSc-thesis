@@ -2,6 +2,7 @@ package hr.fer.genericframeworkforautomaticdictationcorrection.Controllers;
 
 import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.OCRException;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Exceptions.UserNotFoundException;
+import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.MultipleCorrectionsForm;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewCorrectionForm;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Forms.NewDictateFrom;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Models.*;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,7 +59,6 @@ public class CorrectionController {
         org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userService.findByEmail(userDetails.getUsername());
         List<CorrectedDictation> correctedDictationList = correctedDictationService.findByUser(currentUser);
-        //List<CorrectedDictation> correctedDictationList = correctedDictationService.findAll();
 
 
         model.addAttribute("corrections",correctedDictationList);
@@ -160,6 +161,107 @@ public class CorrectionController {
         return Constants.Redirect.CORRECTION_MY;
     }
 
+    @RequestMapping(value = Constants.Paths.CORRECTION_CREATE_MULTIPLE, method = RequestMethod.GET)
+    public String createMultiple(Model model) {
+        MultipleCorrectionsForm  multipleCorrectionsForm = new MultipleCorrectionsForm();
+        model.addAttribute("corrections", multipleCorrectionsForm );
+
+        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByEmail(userDetails.getUsername());
+
+        List<Dictate> dictates = getDictates(user);
+        model.addAttribute("dictates", dictates);
+
+        List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+        model.addAttribute("OCRMethods", OCRMethods);
+
+        return Constants.Views.CREATE_MULTIPLE_CORRECTIONS;
+    }
+
+    @RequestMapping(value = Constants.Paths.CORRECTION_CREATE_MULTIPLE, method = RequestMethod.POST)
+    public String createMultiple(@ModelAttribute("corrections") @Valid MultipleCorrectionsForm multipleDto, BindingResult result, Model model, Errors errors) {
+        org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByEmail(userDetails.getUsername());
+
+        if (result.hasErrors()) {
+            model.addAttribute("corrections", multipleDto);
+            List<Dictate> dictates = getDictates(user);
+            model.addAttribute("dictates", dictates);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            return Constants.Views.CREATE_MULTIPLE_CORRECTIONS;
+        }
+
+        try {
+            if (ObjectUtils.isEmpty(user)) {
+                throw new UserNotFoundException("User not found");
+            }
+            OCR ocr = strategyFactory.getMethod(multipleDto.getUsedOCRMethod());
+            if(ObjectUtils.isEmpty(ocr)){
+                System.err.println("OCR is null");
+                throw new Exception("OCR is null");
+            }
+
+            List<String> urls = multipleDto.getUrlOriginalImages();
+            List<String> names= multipleDto.getNames();
+            int namesSize=names.size();
+
+            List<NewCorrectionForm> corrections= new ArrayList<>();
+            for(int i=0, len = urls.size();i<len;i++){
+                NewCorrectionForm correctionDto = new NewCorrectionForm();
+                String url=urls.get(i);
+                correctionDto.setUrlOriginalImage(url);
+
+                if(namesSize-1<i){
+                    correctionDto.setName(java.time.LocalDateTime.now().toString());
+                }else{
+                    correctionDto.setName(names.get(i));
+                }
+
+
+                String detectedText = ocr.detectText(url);
+                correctionDto.setDetectedText(detectedText);
+                String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
+                String htmlDiff = ocr.getHTMLDiff(originalText, detectedText);
+                correctionDto.setHTMLDiff(htmlDiff);
+
+                correctionDto.setUsedOCRMethod(multipleDto.getUsedOCRMethod());
+                correctionDto.setDictateId(multipleDto.getDictateId());
+
+                MultipartFile correctedImage=ocr.drawBoundBoxesForIncorrectWords(correctionDto.getUrlOriginalImage(), originalText, detectedText);
+
+                String correctedUrl=null;
+                if(correctedImage != null) //maybe method doesn't correct image
+                    correctedUrl=storageService.uploadImage(correctedImage);
+                correctionDto.setUrlCorrectedImage(correctedUrl);
+
+                corrections.add(correctionDto);
+            }
+
+            corrections.stream().forEach(c->correctedDictationService.addCorrection(c, user));
+        }catch (OCRException ex){
+            System.err.println(ex.getMessage());
+            model.addAttribute("corrections", multipleDto);
+            List<Dictate> dictates = getDictates(user);
+            model.addAttribute("dictates", dictates);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            result.rejectValue("usedOCRMethod", "error.usedOCRMethod", "Error! Use other OCR method");
+            model.addAttribute("OCRError","error");
+            return Constants.Views.CREATE_MULTIPLE_CORRECTIONS;
+        } catch (Throwable ex) {
+            System.err.println(ex.getMessage());
+            model.addAttribute("corrections", multipleDto);
+            List<Dictate> dictates = getDictates(user);
+            model.addAttribute("dictates", dictates);
+            List<String> OCRMethods = strategyFactory.getAllMethodesNames();
+            model.addAttribute("OCRMethods", OCRMethods);
+            return Constants.Views.CREATE_MULTIPLE_CORRECTIONS;
+        }
+
+        return Constants.Redirect.CORRECTION_MY;
+    }
+
     private List<Dictate> getDictates(User user){
         if(ObjectUtils.isEmpty(user)){
             return new ArrayList<>();
@@ -191,6 +293,24 @@ public class CorrectionController {
         }
 
         return new GenericResponse(url);
+    }
+
+    @RequestMapping(value = Constants.Paths.CORRECTION_UPLOAD_MULTIPLE, method = RequestMethod.POST)
+    @ResponseBody
+    public GenericResponse uploadMultipleFiles(@RequestParam("file") MultipartFile[] files) {
+        List<String> urls = new ArrayList<>();
+        try {
+            for(MultipartFile file : files){
+                 urls.add(storageService.uploadImage(file));
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new GenericResponse("Error","Error while uploading file(s)");
+        }
+
+        return new GenericResponse(urls.toString());
     }
 
     @RequestMapping(value = Constants.Paths.CORRECTION_DELETE, method = RequestMethod.POST)
