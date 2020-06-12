@@ -36,7 +36,9 @@ public interface Constants {
         String CORRECTION_MY="/corrections/my";
         String CORRECTION_VIEW="/corrections/view";
         String CORRECTION_CREATE="/corrections/create";
+        String CORRECTION_CREATE_MULTIPLE="/corrections/createMultiple";;
         String CORRECTION_UPLOAD_IMAGE="/corrections/uploadImage";
+        String CORRECTION_UPLOAD_MULTIPLE="/corrections/uploadMultiple";
         String CORRECTION_DELETE="/corrections/delete";
         String CORRECTION_EDIT="/corrections/edit";
 
@@ -78,6 +80,7 @@ public interface Constants {
         String EDIT_DICTATE="editDictate";
         String VIEW_CORRECTIONS="corrections";
         String CREATE_CORRECTION="createCorrection";
+        String CREATE_MULTIPLE_CORRECTIONS="createMultipleCorrections";
         String VIEW_CORRECTION="viewCorrection";
         String EDIT_CORRECTION="editCorrection";
     }
