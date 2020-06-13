@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{page.corrections.create}">title</title>
+    <link rel="stylesheet" type="text/css" href="/css/modal.css">
+</head>
+<body>
+<div layout:fragment="page_content" id="page_content">
+    <div class="container">
+        <h4 style="text-align:center" class="m-1" th:text="#{page.corrections.createMultiple}">title </h4>
+    </div>
+    <br>
+
+    <div class="container">
+        <div id="correction" style="margin-top: 50px;" class="mainbox .col-md-6 ">
+            <form id="form" class="form-horizontal" th:action="@{/corrections/createMultiple}" th:object="${corrections}" method="POST" enctype="utf8">
+                <fieldset>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-eye"></i></span>
+                        </div>
+                        <select class="form-control selectpicker" id="usedOCRMethod" th:field="*{usedOCRMethod}">
+                            <option value="" selected="selected" th:text="#{page.corrections.create.ocr}" >ocr</option>
+                            <option th:each="method : ${OCRMethods}"
+                                    th:value="${method}"
+                                    th:text="${method}"></option>
+                        </select>
+                        <div class="col-sm-3">
+                            <small id="usedOCRMethod-error" class="text-danger" th:each="error: ${#fields.errors('usedOCRMethod')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-list"></i></span>
+                        </div>
+                        <select class="form-control selectpicker" id="dictateId" th:field="*{dictateId}">
+                            <option value=0 selected="selected" th:text="#{page.corrections.create.dictate}" >dictate</option>
+                            <option th:each="dictate : ${dictates}"
+                                    th:value="${dictate.getId()}"
+                                    th:text="${dictate.getName()}">
+
+                            </option>
+                        </select>
+                        <div class="col-sm-3">
+                            <small id="dictate-error" class="text-danger" th:each="error: ${#fields.errors('dictateId')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+
+
+                    <div class="input-group mb-3" id = "uploadDiv">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="image-upload" name="uploadedFile" accept="image/*" multiple>
+                            <label class="custom-file-label"  th:text="#{page.corrections.create.image.multiple}">image</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <small id="names-error" class="text-danger" th:each="error: ${#fields.errors('names')}" th:text="${error}">
+                                Validation error
+                            </small>
+                            <small hidden id="info-div" class="text-success">
+                            </small>
+                            <small hidden id="error-div" class="text-danger">
+                            </small>
+                        </div>
+                        <div class="col-sm-3">
+                            <small id="images-error" class="text-danger" th:each="error: ${#fields.errors('urlOriginalImages')}" th:text="${error}">
+                                Validation error
+                            </small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3" id="show-images">
+
+                    </div>
+
+                    <br>
+
+                    <div class="input-group mb-3">
+                        <h5 hidden id="wait-div" class="text-info">
+                        </h5>
+                    </div>
+                    <br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn btn-success" id="submit-btn" type="submit" th:text="#{submit}">submit</button>
+                            <button class="btn btn-warning" id="back-btn" th:href="@{/corrections/my}" th:text="#{back}">back</button>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="/js/correctionMultipleUtils.js"></script>
+</div>
+</body>
+</html>
