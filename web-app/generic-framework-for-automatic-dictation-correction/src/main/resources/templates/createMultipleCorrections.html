@@ -62,23 +62,27 @@
                             <label class="custom-file-label"  th:text="#{page.corrections.create.image.multiple}">image</label>
                         </div>
                         <div class="col-sm-3">
-                            <small id="names-error" class="text-danger" th:each="error: ${#fields.errors('names')}" th:text="${error}">
-                                Validation error
-                            </small>
                             <small hidden id="info-div" class="text-success">
                             </small>
                             <small hidden id="error-div" class="text-danger">
                             </small>
                         </div>
                         <div class="col-sm-3">
-                            <small id="images-error" class="text-danger" th:each="error: ${#fields.errors('urlOriginalImages')}" th:text="${error}">
-                                Validation error
+                            <small id="images-error" class="text-danger" th:each="error: ${#fields.errors('urlOriginalImages')}">
+                                You must upload image(s)
+                            </small>
+                            <small id="names-error" class="text-danger" th:each="error: ${#fields.errors('names')}">
+                                Names error
                             </small>
                         </div>
                     </div>
                     <div class="input-group mb-3" id="show-images">
 
                     </div>
+
+
+                    <input type="hidden" th:field="*{names}" id="names">
+                    <input type="hidden" th:field="*{urlOriginalImages}" id="urlOriginalImages">
 
                     <br>
 
