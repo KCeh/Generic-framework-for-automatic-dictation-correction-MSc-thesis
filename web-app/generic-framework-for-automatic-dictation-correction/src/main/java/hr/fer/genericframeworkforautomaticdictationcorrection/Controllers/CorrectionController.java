@@ -60,7 +60,6 @@ public class CorrectionController {
         User currentUser = userService.findByEmail(userDetails.getUsername());
         List<CorrectedDictation> correctedDictationList = correctedDictationService.findByUser(currentUser);
 
-
         model.addAttribute("corrections",correctedDictationList);
 
         return Constants.Views.VIEW_CORRECTIONS;
@@ -221,7 +220,7 @@ public class CorrectionController {
 
                 String detectedText = ocr.detectText(url);
                 correctionDto.setDetectedText(detectedText);
-                String originalText= dictateService.findById(correctionDto.getDictateId()).getText();
+                String originalText= dictateService.findById(multipleDto.getDictateId()).getText();
                 String htmlDiff = ocr.getHTMLDiff(originalText, detectedText);
                 correctionDto.setHTMLDiff(htmlDiff);
 
