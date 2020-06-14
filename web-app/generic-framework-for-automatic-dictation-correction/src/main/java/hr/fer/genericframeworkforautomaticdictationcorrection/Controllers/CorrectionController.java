@@ -12,6 +12,7 @@ import hr.fer.genericframeworkforautomaticdictationcorrection.Services.*;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.Constants;
 import hr.fer.genericframeworkforautomaticdictationcorrection.Utils.GenericResponse;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,6 +60,7 @@ public class CorrectionController {
         org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userService.findByEmail(userDetails.getUsername());
         List<CorrectedDictation> correctedDictationList = correctedDictationService.findByUser(currentUser);
+
 
         model.addAttribute("corrections",correctedDictationList);
 
@@ -214,7 +216,10 @@ public class CorrectionController {
                 if(namesSize-1<i){
                     correctionDto.setName(java.time.LocalDateTime.now().toString());
                 }else{
-                    correctionDto.setName(names.get(i));
+                    String name=names.get(i);
+                    if (StringUtils.isEmpty(name))
+                        name= java.time.LocalDateTime.now().toString();
+                    correctionDto.setName(name);
                 }
 
 
